@@ -1,0 +1,10 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+@source '../../../../resources/views/components/**/*';
+@source '../../../../resources/views/tables/**/*';
+@source '../../../../resources/views/livewire/**/*';
+@source '../../../../app/Livewire/**/*';
+@source '../../../../vendor/bezhansalleh/filament-language-switch/resources/views/**/*.blade.php';
+@source '../../../../vendor/biostate/filament-menu-builder/resources/views/**/*';
