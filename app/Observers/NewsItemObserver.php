@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use App\Jobs\SingleCron;
 use Carbon\Carbon;
 
-class NewsObserver
+class NewsItemObserver
 {
     /**
      * Handle the News "created" event.
