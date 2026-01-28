@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Categories\Tables;
 
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
@@ -12,6 +12,9 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use App\Filament\Pages\RunCron;
+use Illuminate\Support\Facades\Artisan;
+use Filament\Notifications\Notification;
 
 class CategoriesTable
 {
@@ -42,17 +45,26 @@ class CategoriesTable
             ])
             ->recordActions([
                 Action::make('emptyArticles')
-                    ->label(__('filament.empty_articles'))
+                    ->label(__('filament.empty'))
                     ->color('danger')
+                    ->icon('heroicon-o-folder-open')
                     ->requiresConfirmation()
-                    ->url(fn ($record) => route('category.empty', ['categoryId' => $record->id]))
-                    ->openUrlInNewTab()
+                    ->action(function ($record) {
+                        Artisan::call('cron:empty-articles', ['categoryId' => $record->id, 'olderThanDays' => 3]);
+                        Notifcation::make()
+                            ->title('Articles Emptied')
+                            ->success()
+                            ->send();
+                    })
                     ->button()
                     ->outlined(),
                 Action::make('fetchArticles')
-                    ->label(__('filament.fetch_all_articles'))
-                    ->url(fn ($record) => route('category.cron', ['categoryId' => $record->id]))
-                    ->openUrlInNewTab()
+                    ->label(__('filament.fetch'))
+                    ->icon('heroicon-o-folder-arrow-down')
+                    ->action(fn ($record) => redirect(RunCron::getUrl())->with([
+                        'run_cron_action' => 'fetch',
+                        'run_cron_category_id' => $record->id,
+                    ]))
                     ->button()
                     ->outlined(),
                 EditAction::make()->button()->outlined(),

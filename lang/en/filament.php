@@ -207,6 +207,8 @@ return [
     'image_url' => 'Image URL',
     'upload_image' => 'Upload Image',
     'use_url' => 'Use URL',
+    'empty' => 'Empty',
+    'fetch' => 'Fetch',
     'empty_articles' => 'Empty Articles',
     'fetch_all_articles' => 'Fetch All Articles',
     'fetch_full_articles' => 'Fetch Full Articles',

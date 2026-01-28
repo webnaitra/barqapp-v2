@@ -13,6 +13,9 @@ use Filament\Tables\Table;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Actions\DeleteAction;
+use App\Filament\Pages\RunCron;
+use Illuminate\Support\Facades\Artisan;
+use Filament\Notifications\Notification;
 
 class SourcesTable
 {
@@ -60,17 +63,26 @@ class SourcesTable
             ],layout: FiltersLayout::AboveContent)
             ->recordActions([
                 Action::make('emptyArticles')
-                    ->label(__('filament.empty_articles'))
+                    ->label(__('filament.empty'))
+                    ->icon('heroicon-o-folder-open')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->url(fn ($record) => route('source.empty', ['sourceId' => $record->id]))
-                    ->openUrlInNewTab()
+                    ->action(function ($record) {
+                        Artisan::call('cron:empty-articles', ['sourceId' => $record->id, 'olderThanDays' => 3]);
+                        Notification::make()
+                            ->title('Articles Emptied')
+                            ->success()
+                            ->send();
+                    })
                     ->button()
                     ->outlined(),
                 Action::make('fetchArticles')
-                    ->label(__('filament.fetch_all_articles'))
-                    ->url(fn ($record) => route('source.cron', ['sourceId' => $record->id]))
-                    ->openUrlInNewTab()
+                    ->label(__('filament.fetch'))
+                    ->icon('heroicon-o-folder-arrow-down')
+                    ->action(fn ($record) => redirect(RunCron::getUrl())->with([
+                        'run_cron_action' => 'fetch',
+                        'run_cron_source_id' => $record->id,
+                    ]))
                     ->button()
                     ->outlined(),
                 EditAction::make()->button()->outlined(),

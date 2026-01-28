@@ -22,8 +22,34 @@ class RunCron extends Page
         return __('filament.run_cron');
     }
     protected string $view = 'filament.pages.run-cron';
+    
+    public $startFetch = false;
+    public $fetchResults = [];
+    public $filters = ['categoryId' => null, 'sourceId' => null];
 
-    protected function getActions(): array
+    protected $listeners = ['fetchArticles' => 'runFetch'];
+
+    public function mount()
+    {
+        if (session()->has('run_cron_action') && session('run_cron_action') == 'fetch') {
+             $this->filters['categoryId'] = session('run_cron_category_id');
+             $this->filters['sourceId'] = session('run_cron_source_id');
+             $this->runFetch();
+        }
+    }
+
+    public function runFetch() 
+    {
+        $service = new \App\Services\FetchArticlesService();
+        $this->fetchResults = $service->fetch(
+            $this->filters['categoryId'], 
+            $this->filters['sourceId']
+        );
+        $this->startFetch = true;
+    }
+
+
+    protected function getHeaderActions(): array
     {
         return [
             \Filament\Actions\Action::make('emptyArticles')
@@ -38,10 +64,12 @@ class RunCron extends Page
                     \Filament\Forms\Components\Select::make('categoryId')
                         ->label(__('filament.category'))
                         ->options(\App\Models\Category::pluck('name', 'id'))
+                        ->placeholder('All Categories')
                         ->searchable(),
                     \Filament\Forms\Components\Select::make('sourceId')
                         ->label(__('filament.source'))
                         ->options(\App\Models\Source::pluck('name', 'id'))
+                        ->placeholder('All Sources')
                         ->searchable(),
                 ])
                 ->action(function (array $data) {
@@ -65,44 +93,18 @@ class RunCron extends Page
                     \Filament\Forms\Components\Select::make('categoryId')
                         ->label(__('filament.category'))
                         ->options(\App\Models\Category::pluck('name', 'id'))
+                        ->placeholder('All Categories')
                         ->searchable(),
                     \Filament\Forms\Components\Select::make('sourceId')
                         ->label(__('filament.source'))
                         ->options(\App\Models\Source::pluck('name', 'id'))
+                        ->placeholder('All Sources')
                         ->searchable(),
                 ])
                 ->action(function (array $data) {
-                    \Illuminate\Support\Facades\Artisan::call('cron:fetch-all-articles', [
-                        'categoryId' => $data['categoryId'],
-                        'sourceId' => $data['sourceId'],
-                        'showOutput' => 1,
-                    ]);
-
-                    \Filament\Notifications\Notification::make()
-                        ->title(__('filament.success'))
-                        ->body(\Illuminate\Support\Facades\Artisan::output())
-                        ->success()
-                        ->send();
-                }),
-
-            \Filament\Actions\Action::make('fetchFullArticles')
-                ->label(__('filament.fetch_full_articles'))
-                ->color('success')
-                ->form([
-                    \Filament\Forms\Components\TextInput::make('newsId')
-                        ->label(__('filament.news_id'))
-                        ->required(),
-                ])
-                ->action(function (array $data) {
-                    \Illuminate\Support\Facades\Artisan::call('cron:fetch-articles', [
-                        'news' => $data['newsId'],
-                    ]);
-
-                    \Filament\Notifications\Notification::make()
-                        ->title(__('filament.success'))
-                        ->body(\Illuminate\Support\Facades\Artisan::output())
-                        ->success()
-                        ->send();
+                    $this->filters['categoryId'] = $data['categoryId'];
+                    $this->filters['sourceId'] = $data['sourceId'];
+                    $this->runFetch();
                 }),
         ];
     }

@@ -208,6 +208,8 @@ return [
     'upload_image' => 'رفع صورة',
     'use_url' => 'استخدام رابط',
     'empty_articles' => 'تفريغ المقالات',
+    'fetch' => 'جلب',
+    'empty' => 'فارغ',
     'fetch_all_articles' => 'جلب جميع المقالات',
     'fetch_full_articles' => 'جلب تفاصيل المقال',
     'older_than_days' => 'أقدم من (أيام)',
