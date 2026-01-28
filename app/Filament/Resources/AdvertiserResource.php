@@ -33,68 +33,80 @@ class AdvertiserResource extends Resource
     protected static ?string $model = Advertiser::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-circle';
-    protected static string | \UnitEnum | null $navigationGroup = 'Administration';
     protected static ?int $navigationSort = 2;
     protected static ?string $recordTitleAttribute = 'adv_username';
-    protected static ?string $modelLabel = 'Frontend User';
-    protected static ?string $pluralModelLabel = 'Frontend Users';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.administration');
+    }
+    
+    public static function getModelLabel(): string
+    {
+        return __('filament.frontend_user');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.frontend_users');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                TextInput::make('adv_first_name')
+                TextInput::make('adv_first_name')->label(__('filament.adv_first_name'))
                     ->maxLength(255)
-                    ->label('First Name')
+                    ->label(__('filament.first_name'))
                     ->default(null),
-                TextInput::make('adv_last_name')
+                TextInput::make('adv_last_name')->label(__('filament.adv_last_name'))
                     ->maxLength(255)
-                    ->label('Last Name')    
+                    ->label(__('filament.last_name'))    
                     ->default(null),
-                TextInput::make('adv_username')
+                TextInput::make('adv_username')->label(__('filament.adv_username'))
                     ->required()
-                    ->label('Username')
+                    ->label(__('filament.username'))
                     ->maxLength(255),
-                TextInput::make('adv_email')
+                TextInput::make('adv_email')->label(__('filament.adv_email'))
                     ->email()
                     ->maxLength(255)
-                    ->label('Email')
+                    ->label(__('filament.email'))
                     ->default(null),
-                TextInput::make('adv_password')
+                TextInput::make('adv_password')->label(__('filament.adv_password'))
                     ->password()
                     ->maxLength(255)
-                    ->label('Password')
+                    ->label(__('filament.password'))
                     ->default(null),
-                TextInput::make('adv_mobile')
+                TextInput::make('adv_mobile')->label(__('filament.adv_mobile'))
                     ->maxLength(20)
-                    ->label('Mobile')
+                    ->label(__('filament.mobile'))
                     ->default(null),
-                FileUpload::make('image')
+                FileUpload::make('image')->label(__('filament.image'))
                     ->image()
                     ->default(null),
-                Select::make('sources')
+                Select::make('sources')->label(__('filament.sources'))
                     ->relationship(name: 'sources', titleAttribute: 'arabic_name')
                     ->multiple()
                     ->searchable()
                     ->preload(),
-                Select::make('categories')
+                Select::make('categories')->label(__('filament.categories'))
                     ->relationship(name: 'categories', titleAttribute: 'arabic_name')
                     ->multiple()
                     ->searchable()
                     ->preload(),
-                Select::make('keywords')
+                Select::make('keywords')->label(__('filament.keywords'))
                     ->relationship(name: 'keywords', titleAttribute: 'keyword_name')
                     ->multiple()
                     ->searchable()
                     ->preload(),
-                Toggle::make('email_notifications_enabled')
-                    ->label('Email Notifications Enabled')
+                Toggle::make('email_notifications_enabled')->label(__('filament.email_notifications_enabled'))
+                    ->label(__('filament.email_notifications_enabled'))
                     ->required(),
-                Toggle::make('push_notifications_enabled')
-                    ->label('Push Notifications Enabled')
+                Toggle::make('push_notifications_enabled')->label(__('filament.push_notifications_enabled'))
+                    ->label(__('filament.push_notifications_enabled'))
                     ->required(),
-                DateTimePicker::make('last_email_digest_sent')
-                    ->label('Last Email Digest Sent')
+                DateTimePicker::make('last_email_digest_sent')->label(__('filament.last_email_digest_sent'))
+                    ->label(__('filament.last_email_digest_sent'))
                     ->default(null),
             ]);
     }
@@ -103,49 +115,49 @@ class AdvertiserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('adv_first_name')
-                    ->label('First Name')
+                TextColumn::make('adv_first_name')->label(__('filament.adv_first_name'))
+                    ->label(__('filament.first_name'))
                     ->searchable(),
-                TextColumn::make('adv_last_name')
-                    ->label('Last Name')
+                TextColumn::make('adv_last_name')->label(__('filament.adv_last_name'))
+                    ->label(__('filament.last_name'))
                     ->searchable(),
-                TextColumn::make('adv_username')
-                    ->label('Username')
+                TextColumn::make('adv_username')->label(__('filament.adv_username'))
+                    ->label(__('filament.username'))
                     ->searchable(),
-                TextColumn::make('adv_email')
-                    ->label('Email')
+                TextColumn::make('adv_email')->label(__('filament.adv_email'))
+                    ->label(__('filament.email'))
                     ->searchable(),
-                TextColumn::make('adv_age')
-                    ->label('Age')
+                TextColumn::make('adv_age')->label(__('filament.adv_age'))
+                    ->label(__('filament.age'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('adv_mobile')
-                    ->label('Mobile')
+                TextColumn::make('adv_mobile')->label(__('filament.adv_mobile'))
+                    ->label(__('filament.mobile'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('adv_lang')
-                    ->label('Language')
+                TextColumn::make('adv_lang')->label(__('filament.adv_lang'))
+                    ->label(__('filament.language'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                IconColumn::make('email_notifications_enabled')
-                    ->label('Email Notifications')
+                IconColumn::make('email_notifications_enabled')->label(__('filament.email_notifications_enabled'))
+                    ->label(__('filament.email_notifications'))
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
-                IconColumn::make('push_notifications_enabled')
-                    ->label('Push Notifications')
+                IconColumn::make('push_notifications_enabled')->label(__('filament.push_notifications_enabled'))
+                    ->label(__('filament.push_notifications'))
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('last_email_digest_sent')
+                TextColumn::make('last_email_digest_sent')->label(__('filament.last_email_digest_sent'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

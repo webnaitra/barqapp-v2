@@ -15,23 +15,23 @@ class MenuForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
+                TextInput::make('name')->label(__('filament.name'))
                 ->live(onBlur: true)
                 ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
-                TextInput::make('slug'),
-                Repeater::make('menuItems')
+                TextInput::make('slug')->label(__('filament.slug')),
+                Repeater::make('menuItems')->label(__('filament.menuitems'))
                 ->relationship()
                 ->schema([
-                    TextInput::make('name')->required(),
-                    Select::make('type')
+                    TextInput::make('name')->label(__('filament.name'))->required(),
+                    Select::make('type')->label(__('filament.type'))
                     ->options([
                         'internal' => 'Internal',
                         'external' => 'External',
                     ])
                     ->default('internal')
                     ->required(),
-                    TextInput::make('url'),
-                    Select::make('target')
+                    TextInput::make('url')->label(__('filament.url')),
+                    Select::make('target')->label(__('filament.target'))
                     ->options([
                         '_self' => 'Self',
                         '_blank' => 'Blank',
@@ -43,7 +43,7 @@ class MenuForm
                 ->orderColumn('order')
                 ->columns(4)
                 ->columnSpan('full')
-                ->label('Menu Items'),
+                ->label(__('filament.menu_items')),
             ]);
     }
 }

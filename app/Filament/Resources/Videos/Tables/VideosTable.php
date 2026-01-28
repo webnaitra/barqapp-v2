@@ -21,48 +21,48 @@ class VideosTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('sources.arabic_name')
+                TextColumn::make('sources.arabic_name')->label(__('filament.sourcesarabic_name'))
                     ->searchable()
-                    ->label('Source'),
-                TextColumn::make('category.name')
+                    ->label(__('filament.source')),
+                TextColumn::make('category.name')->label(__('filament.categoryname'))
                     ->sortable()
-                    ->label('Category'),
-                TextColumn::make('countries.arabic_name')
+                    ->label(__('filament.category')),
+                TextColumn::make('countries.arabic_name')->label(__('filament.countriesarabic_name'))
                     ->sortable()
-                    ->label('Country'),
-                TextColumn::make('video')
+                    ->label(__('filament.country')),
+                TextColumn::make('video')->label(__('filament.video'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('source_link')
+                TextColumn::make('source_link')->label(__('filament.source_link'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
                        ->filters([
-                SelectFilter::make('sources')
+                SelectFilter::make('sources')->label(__('filament.sources'))
                 ->relationship('sources', 'arabic_name')
                 ->searchable()
                 ->preload(),
-                SelectFilter::make('category')
+                SelectFilter::make('category')->label(__('filament.category'))
                 ->relationship('category', 'name')
                 ->searchable()
                 ->preload(),
-                SelectFilter::make('countries')
+                SelectFilter::make('countries')->label(__('filament.countries'))
                 ->relationship('countries', 'arabic_name')
                 ->searchable()
                 ->preload(),
-                Filter::make('created_from')
+                Filter::make('created_from')->label(__('filament.created_from'))
                     ->schema([
-                        DatePicker::make('created_from'),
+                        DatePicker::make('created_from')->label(__('filament.created_from')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -72,9 +72,9 @@ class VideosTable
                             );
                            
                     }),
-                    Filter::make('created_until')
+                    Filter::make('created_until')->label(__('filament.created_until'))
                     ->schema([
-                        DatePicker::make('created_until'),
+                        DatePicker::make('created_until')->label(__('filament.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

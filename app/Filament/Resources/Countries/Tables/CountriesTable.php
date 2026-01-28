@@ -15,21 +15,21 @@ class CountriesTable
     {
         return $table
             ->columns([
-                TextColumn::make('arabic_name')
+                TextColumn::make('arabic_name')->label(__('filament.arabic_name'))
                     ->searchable(),
-                TextColumn::make('name')
+                TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('currency_code')
+                TextColumn::make('currency_code')->label(__('filament.currency_code'))
                     ->searchable(),
-                TextColumn::make('arabic_currency_name')
+                TextColumn::make('arabic_currency_name')->label(__('filament.arabic_currency_name'))
                     ->searchable(),
-                TextColumn::make('country_code')
+                TextColumn::make('country_code')->label(__('filament.country_code'))
                     ->searchable(),
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

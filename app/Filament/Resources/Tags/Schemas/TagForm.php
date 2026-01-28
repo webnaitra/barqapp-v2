@@ -12,16 +12,16 @@ class TagForm
     {
         return $schema
             ->components([
-                TextInput::make('tag_name')
+                TextInput::make('tag_name')->label(__('filament.tag_name'))
                     ->required()
                     ->maxLength(255)
                     ->columnSpan(2)
-                    ->label('Name'),
-                FileUpload::make('image')
+                    ->label(__('filament.name')),
+                FileUpload::make('image')->label(__('filament.image'))
                     ->image()
                     ->default(null)
                     ->columnSpan(2)
-                    ->label('Image'),
+                    ->label(__('filament.image')),
             ]);
     }
 }

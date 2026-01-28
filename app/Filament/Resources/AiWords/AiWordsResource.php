@@ -19,12 +19,28 @@ class AiWordsResource extends Resource
     protected static ?string $model = AiWord::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    protected static string | \UnitEnum | null $navigationGroup = 'News Management';
     protected static ?int $navigationSort = 3;
     protected static ?string $recordTitleAttribute = 'word';
-    protected static ?string $navigationLabel = 'AI Words';
-    protected static ?string $modelLabel = 'AI Word';
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.news_management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.ai_words');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.ai_word');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.ai_words');
+    }
 
     public static function form(Schema $schema): Schema
     {

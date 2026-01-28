@@ -19,9 +19,21 @@ class AffiliateCategoryResource extends Resource
     protected static ?string $model = ProductCategory::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-server-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Ads Management';
-    protected static ?string $modelLabel = 'Affiliate Category';
-    protected static ?string $pluralModelLabel = 'Affiliate Categories';
+    
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.ads_management');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.affiliate_category');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.affiliate_categories');
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 

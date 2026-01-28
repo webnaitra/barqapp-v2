@@ -19,7 +19,20 @@ class SourceFeedResource extends Resource
     protected static ?string $model = SourceFeed::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rss';
-    protected static string | \UnitEnum | null $navigationGroup = 'Source Management';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.source_management');
+    }
+
+        public static function getModelLabel(): string
+    {
+        return __('filament.source_feed');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.source_feeds');
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 

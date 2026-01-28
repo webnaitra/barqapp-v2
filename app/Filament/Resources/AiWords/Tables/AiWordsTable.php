@@ -17,27 +17,27 @@ class AiWordsTable
     {
         return $table
             ->columns([
-                TextColumn::make('words')
+                TextColumn::make('words')->label(__('filament.words'))
                     ->searchable(),
-                TextColumn::make('category.arabic_name')
+                TextColumn::make('category.arabic_name')->label(__('filament.categoryarabic_name'))
                     ->searchable(),
-                TextColumn::make('tags.tag_name')
+                TextColumn::make('tags.tag_name')->label(__('filament.tagstag_name'))
                     ->searchable(),
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('category')
+                SelectFilter::make('category')->label(__('filament.category'))
                     ->relationship('category', 'name')
                     ->searchable()
                     ->preload(),
-                SelectFilter::make('tags')
+                SelectFilter::make('tags')->label(__('filament.tags'))
                     ->relationship('tags', 'tag_name')
                     ->searchable()
                     ->preload(),

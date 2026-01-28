@@ -19,39 +19,39 @@ class SourcesTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('arabic_name')
+                TextColumn::make('arabic_name')->label(__('filament.arabic_name'))
                     ->searchable(),
-                TextColumn::make('country.arabic_name')
-                    ->label('Country')
+                TextColumn::make('country.arabic_name')->label(__('filament.countryarabic_name'))
+                    ->label(__('filament.country'))
                     ->sortable(),
-                ToggleColumn::make('freeze'),
-                TextColumn::make('phone')
+                ToggleColumn::make('freeze')->label(__('filament.freeze')),
+                TextColumn::make('phone')->label(__('filament.phone'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('email')
-                    ->label('Email address')
+                TextColumn::make('email')->label(__('filament.email'))
+                    ->label(__('filament.email_address'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('website')
+                TextColumn::make('website')->label(__('filament.website'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                ImageColumn::make('placeholder_image')
+                ImageColumn::make('placeholder_image')->label(__('filament.placeholder_image'))
                 ->toggleable(isToggledHiddenByDefault: true),
-                ImageColumn::make('logo')
+                ImageColumn::make('logo')->label(__('filament.logo'))
                 ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('country')
+                SelectFilter::make('country')->label(__('filament.country'))
                     ->relationship('country', 'arabic_name')
                     ->searchable()
                     ->multiple()

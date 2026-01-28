@@ -31,26 +31,39 @@ class AdsenseResource extends Resource
     protected static ?string $model = Adsense::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-currency-dollar';
-    protected static string | \UnitEnum | null $navigationGroup = 'Ads Management';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.ads_management');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.adsense');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.adsenses');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                TextInput::make('adsense_name')
+                TextInput::make('adsense_name')->label(__('filament.adsense_name'))
                     ->maxLength(255)
                     ->default(null)
-                    ->label('Name'),
-                CodeEditor::make('adsense_code')
-                    ->label('Code')
+                    ->label(__('filament.name')),
+                CodeEditor::make('adsense_code')->label(__('filament.adsense_code'))
+                    ->label(__('filament.code'))
                     ->columnSpanFull(),
-                Select::make('category_id')
+                Select::make('category_id')->label(__('filament.category_id'))
                     ->relationship(name: 'category', titleAttribute: 'name')
                     ->required(),
-                Select::make('location_id')
+                Select::make('location_id')->label(__('filament.location_id'))
                     ->relationship(name: 'location', titleAttribute: 'name'),
-                Toggle::make('is_mobile')
-                    ->label('For Mobile')
+                Toggle::make('is_mobile')->label(__('filament.is_mobile'))
+                    ->label(__('filament.for_mobile'))
                     ->default(false),
             ]);
     }
@@ -59,15 +72,15 @@ class AdsenseResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('adsense_name')
+                TextColumn::make('adsense_name')->label(__('filament.adsense_name'))
                     ->searchable(),
-                TextColumn::make('adsense_area')
+                TextColumn::make('adsense_area')->label(__('filament.adsense_area'))
                     ->searchable(),
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

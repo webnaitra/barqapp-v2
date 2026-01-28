@@ -11,15 +11,15 @@ class CountryForm
     {
         return $schema
             ->components([
-                TextInput::make('arabic_name')
+                TextInput::make('arabic_name')->label(__('filament.arabic_name'))
                     ->default(null),
-                TextInput::make('name')
+                TextInput::make('name')->label(__('filament.name'))
                     ->default(null),
-                TextInput::make('currency_code')
+                TextInput::make('currency_code')->label(__('filament.currency_code'))
                     ->default(null),
-                TextInput::make('arabic_currency_name')
+                TextInput::make('arabic_currency_name')->label(__('filament.arabic_currency_name'))
                     ->default(null),
-                TextInput::make('country_code')
+                TextInput::make('country_code')->label(__('filament.country_code'))
                     ->default(null),
             ]);
     }

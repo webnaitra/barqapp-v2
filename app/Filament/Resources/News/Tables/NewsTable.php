@@ -23,68 +23,68 @@ class NewsTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('category.arabic_name')
+                TextColumn::make('category.arabic_name')->label(__('filament.categoryarabic_name'))
                     ->sortable(),
-                TextColumn::make('sources.arabic_name')
+                TextColumn::make('sources.arabic_name')->label(__('filament.sourcesarabic_name'))
                     ->sortable(),
-                TextColumn::make('date')
+                TextColumn::make('date')->label(__('filament.date'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('tags.tag_name')
+                TextColumn::make('tags.tag_name')->label(__('filament.tagstag_name'))
                     ->sortable()
-                    ->label('Tags')
+                    ->label(__('filament.tags'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('keywords.keyword_name')
+                TextColumn::make('keywords.keyword_name')->label(__('filament.keywordskeyword_name'))
                     ->sortable()
-                    ->label('Keywords')
+                    ->label(__('filament.keywords'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                ToggleColumn::make('urgent')
+                ToggleColumn::make('urgent')->label(__('filament.urgent'))
                     ->sortable()
-                    ->label('Trending')
+                    ->label(__('filament.trending'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('source_link')
+                TextColumn::make('source_link')->label(__('filament.source_link'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                IconColumn::make('run_cron')
+                IconColumn::make('run_cron')->label(__('filament.run_cron'))
                     ->boolean()
-                    ->label('Processing Pending')
+                    ->label(__('filament.processing_pending'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                IconColumn::make('is_updated')
+                IconColumn::make('is_updated')->label(__('filament.is_updated'))
                     ->boolean()
-                    ->label('Processing Complete')
+                    ->label(__('filament.processing_complete'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('sources')
+                SelectFilter::make('sources')->label(__('filament.sources'))
                 ->relationship('sources', 'arabic_name')
                 ->searchable()
                 ->preload(),
-                SelectFilter::make('category')
+                SelectFilter::make('category')->label(__('filament.category'))
                 ->relationship('category', 'arabic_name')
                 ->searchable()
                 ->preload(),
-                SelectFilter::make('tags')
+                SelectFilter::make('tags')->label(__('filament.tags'))
                 ->relationship('tags', 'tag_name')
                 ->searchable()
                 ->preload(),
-                SelectFilter::make('keywords')
+                SelectFilter::make('keywords')->label(__('filament.keywords'))
                 ->relationship('keywords', 'keyword_name')
                 ->searchable()
                 ->preload(),
-                Filter::make('created_from')
+                Filter::make('created_from')->label(__('filament.created_from'))
                     ->schema([
-                        DatePicker::make('created_from'),
+                        DatePicker::make('created_from')->label(__('filament.created_from')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -94,9 +94,9 @@ class NewsTable
                             );
                            
                     }),
-                    Filter::make('created_until')
+                    Filter::make('created_until')->label(__('filament.created_until'))
                     ->schema([
-                        DatePicker::make('created_until'),
+                        DatePicker::make('created_until')->label(__('filament.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

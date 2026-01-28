@@ -16,9 +16,9 @@ class MenusTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('slug')
+                TextColumn::make('slug')->label(__('filament.slug'))
                     ->searchable(),
             ])
             ->filters([

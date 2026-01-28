@@ -12,21 +12,21 @@ class SourceFeedForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
+                TextInput::make('name')->label(__('filament.name'))
                     ->default(null),
-                TextInput::make('source_url')
+                TextInput::make('source_url')->label(__('filament.source_url'))
                     ->url()
                     ->default(null),
-                TextInput::make('source_id')
+                TextInput::make('source_id')->label(__('filament.source_id'))
                     ->required()
                     ->numeric()
                     ->default(0),
-                TextInput::make('category_id')
+                TextInput::make('category_id')->label(__('filament.category_id'))
                     ->numeric()
                     ->default(null),
-                Toggle::make('status_id')
+                Toggle::make('status_id')->label(__('filament.status_id'))
                     ->required(),
-                Toggle::make('freeze')
+                Toggle::make('freeze')->label(__('filament.freeze'))
                     ->required(),
             ]);
     }

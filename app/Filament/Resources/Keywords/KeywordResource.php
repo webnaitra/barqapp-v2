@@ -19,7 +19,20 @@ class KeywordResource extends Resource
     protected static ?string $model = Keyword::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-ticket';
-    protected static string | \UnitEnum | null $navigationGroup = 'News Management';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.news_management');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.keyword');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.keywords');
+    }
 
     protected static ?string $recordTitleAttribute = 'tag_name';
 

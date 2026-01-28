@@ -12,17 +12,17 @@ class AiWordsForm
     {
         return $schema
             ->components([
-                TagsInput::make('words')
+                TagsInput::make('words')->label(__('filament.words'))
                     ->separator(',')
                     ->columnSpan(2)
                     ->required(),
-                Select::make('category_id')
+                Select::make('category_id')->label(__('filament.category_id'))
                     ->relationship(name: 'category', titleAttribute: 'name')->required(),
-                Select::make('tags')
+                Select::make('tags')->label(__('filament.tags'))
                     ->relationship(name: 'tags', titleAttribute: 'tag_name')
                     ->multiple()
                     ->preload()
-                    ->label('Tags')
+                    ->label(__('filament.tags'))
                     ->required(),
             ]);
     }

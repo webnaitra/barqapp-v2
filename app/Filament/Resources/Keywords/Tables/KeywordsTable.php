@@ -18,32 +18,32 @@ class KeywordsTable
     {
         return $table
             ->columns([
-                TextColumn::make('keyword_name')
+                TextColumn::make('keyword_name')->label(__('filament.keyword_name'))
                     ->searchable(),
-                TextColumn::make('category.arabic_name')
-                    ->label('Category')
+                TextColumn::make('category.arabic_name')->label(__('filament.categoryarabic_name'))
+                    ->label(__('filament.category'))
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('countries.arabic_name')
-                    ->label('Countries')
+                TextColumn::make('countries.arabic_name')->label(__('filament.countriesarabic_name'))
+                    ->label(__('filament.countries'))
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('country')
+                SelectFilter::make('country')->label(__('filament.country'))
                     ->relationship('countries', 'arabic_name')
                     ->searchable()
                     ->multiple()
                     ->preload(),
-                SelectFilter::make('category')
+                SelectFilter::make('category')->label(__('filament.category'))
                     ->relationship('category', 'arabic_name')
                     ->searchable()
                     ->multiple()

@@ -11,11 +11,11 @@ class LocationForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
+                TextInput::make('name')->label(__('filament.name'))
                     ->default(null),
-                TextInput::make('arabic_name')
+                TextInput::make('arabic_name')->label(__('filament.arabic_name'))
                     ->default(null),
-                TextInput::make('slug')
+                TextInput::make('slug')->label(__('filament.slug'))
                     ->default(null),
             ]);
     }

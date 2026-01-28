@@ -26,7 +26,7 @@ return new class extends Migration
                 $table->foreignId('source_id')->nullable()->constrained('sources')->cascadeOnDelete();
                 $table->string('source_link')->nullable();
                 $table->boolean('user_id')->default(1);
-                $table->string('excerpt', 191)->default('0');
+                $table->text('excerpt')->nullable();
                 $table->boolean('run_cron')->default(0);
                 $table->boolean('is_updated')->default(0);
                 $table->timestamps();

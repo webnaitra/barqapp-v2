@@ -16,17 +16,17 @@ class TagsTable
     {
         return $table
             ->columns([
-                TextColumn::make('tag_name')
+                TextColumn::make('tag_name')->label(__('filament.tag_name'))
                     ->searchable()
-                    ->label('Name'),
-                ImageColumn::make('image')
+                    ->label(__('filament.name')),
+                ImageColumn::make('image')->label(__('filament.image'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

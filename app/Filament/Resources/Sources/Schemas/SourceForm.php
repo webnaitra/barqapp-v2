@@ -21,78 +21,78 @@ class SourceForm
         return $schema
             ->components([
 
-Tabs::make('Tabs')
+Tabs::make('Tabs')->label(__('filament.tabs'))
     ->tabs([
-        Tab::make('General')
+        Tab::make('General')->label(__('filament.general'))
             ->icon(Heroicon::OutlinedFolder)
             ->schema([
-                TextInput::make('name')
+                TextInput::make('name')->label(__('filament.name'))
                     ->default(null),
-                TextInput::make('arabic_name')
+                TextInput::make('arabic_name')->label(__('filament.arabic_name'))
                     ->default(null),
-                Textarea::make('description')
+                Textarea::make('description')->label(__('filament.description'))
                     ->default(null)
                     ->columnSpanFull(),
-                Select::make('country_id')
+                Select::make('country_id')->label(__('filament.country_id'))
                     ->relationship('country', 'name')
                     ->searchable()
                     ->preload()
-                    ->label('Country'),
-                Toggle::make('freeze')
+                    ->label(__('filament.country')),
+                Toggle::make('freeze')->label(__('filament.freeze'))
                     ->required(),
-                TextInput::make('phone')
+                TextInput::make('phone')->label(__('filament.phone'))
                     ->tel()
                     ->default(null),
-                TextInput::make('email')
-                    ->label('Email address')
+                TextInput::make('email')->label(__('filament.email'))
+                    ->label(__('filament.email_address'))
                     ->email()
                     ->default(null),
-                TextInput::make('website')
+                TextInput::make('website')->label(__('filament.website'))
                     ->url()
                     ->default(null),
-                FileUpload::make('placeholder_image')
+                FileUpload::make('placeholder_image')->label(__('filament.placeholder_image'))
                     ->image()
                     ->directory('public/files')
                     ->visibility('public'),
-                FileUpload::make('logo')
+                FileUpload::make('logo')->label(__('filament.logo'))
                     ->image()
                     ->directory('public/files')
                     ->visibility('public'),
-                Textarea::make('filter_classes')
+                Textarea::make('filter_classes')->label(__('filament.filter_classes'))
                     ->default(null)
                     ->columnSpanFull(),
-                Textarea::make('content_classes')
+                Textarea::make('content_classes')->label(__('filament.content_classes'))
                     ->default(null)
                     ->columnSpanFull(),
-                Textarea::make('image_classes')
+                Textarea::make('image_classes')->label(__('filament.image_classes'))
                     ->default(null)
                     ->columnSpanFull(),
             ]),
-        Tab::make('Source Feeds')
+        Tab::make('Source Feeds')->label(__('filament.source_feeds'))
             ->icon(Heroicon::OutlinedRss)
             ->schema([
-                Repeater::make('sourcefeeds')
+                Repeater::make('sourcefeeds')->label(__('filament.sourcefeeds'))
                 ->relationship()
                 ->schema([
-                    TextInput::make('source_url')->default(null)->required(),
-                    Select::make('category_id')
+                    TextInput::make('source_url')->label(__('filament.source_url'))->default(null)->required(),
+                    Select::make('category_id')->label(__('filament.category_id'))
                         ->relationship('category', 'name')
                         ->searchable()
                         ->preload()
-                        ->label('Category'),
-                    Toggle::make('freeze'),
-                    Toggle::make('status_id')
-                        ->label('Status'),
+                        ->label(__('filament.category')),
+                    Toggle::make('freeze')->label(__('filament.freeze')),
+                    Toggle::make('status_id')->label(__('filament.status_id'))
+                        ->label(__('filament.status')),
                 ])
                 ->extraItemActions([
-                Action::make('testFeed')
+                Action::make('testFeed')->label(__('filament.testfeed'))
                     ->icon(Heroicon::Play)
                     ->url(function (array $arguments, Repeater $component) {
                         $itemData = $component->getItemState($arguments['item']);
                         return $itemData['source_url'];
                     })
                     ->openUrlInNewTab()
-                    ->label('Test Feed'),
+                    ->label(__('filament.test_feed')),
 
                 ])
                 ->addActionLabel('Add Source Feed')

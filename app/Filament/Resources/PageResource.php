@@ -29,20 +29,33 @@ class PageResource extends Resource
     protected static ?string $model = Page::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-puzzle-piece';
-    protected static string | \UnitEnum | null $navigationGroup = 'Miscellaneous';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.miscellaneous');
+    }
+
+        public static function getModelLabel(): string
+    {
+        return __('filament.page');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.pages');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                TextInput::make('page_name')
+                TextInput::make('page_name')->label(__('filament.page_name'))
                     ->live(onBlur: true)
                     ->afterStateUpdated(fn (Set $set, ?string $state) => $set('page_slug', Str::slug($state))),
-                TextInput::make('page_slug'),
-                RichEditor::make('page_content')
+                TextInput::make('page_slug')->label(__('filament.page_slug')),
+                RichEditor::make('page_content')->label(__('filament.page_content'))
                     ->default(null)
                     ->columnSpanFull(),
-                FileUpload::make('image')
+                FileUpload::make('image')->label(__('filament.image'))
                     ->image()
                     ->default(null),
             ]);
@@ -52,15 +65,15 @@ class PageResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('page_name')
+                TextColumn::make('page_name')->label(__('filament.page_name'))
                     ->searchable(),
-                TextColumn::make('page_slug')
+                TextColumn::make('page_slug')->label(__('filament.page_slug'))
                     ->searchable(),
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

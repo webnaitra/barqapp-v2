@@ -19,7 +19,20 @@ class LocationResource extends Resource
     protected static ?string $model = Location::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-group';
-    protected static string | \UnitEnum | null $navigationGroup = 'Ads Management';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.ads_management');
+    }
+
+        public static function getModelLabel(): string
+    {
+        return __('filament.location');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.locations');
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 

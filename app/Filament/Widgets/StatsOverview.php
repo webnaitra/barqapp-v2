@@ -22,12 +22,12 @@ class StatsOverview extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('News', News::count())->url(NewsResource::getUrl()),
-            Stat::make('Videos', Video::count())->url(VideoResource::getUrl()),
-            Stat::make('Categories', Category::count())->url(CategoryResource::getUrl()),
-            Stat::make('Source', Source::count())->url(SourceResource::getUrl()),
-            Stat::make('Users', Advertiser::count())->url(AdvertiserResource::getUrl()),
-            Stat::make('Livestream', LiveStream::count())->url(LiveStreamResource::getUrl()),
+            Stat::make(__('filament.news'), News::count())->url(NewsResource::getUrl()),
+            Stat::make(__('filament.videos'), Video::count())->url(VideoResource::getUrl()),
+            Stat::make(__('filament.categories'), Category::count())->url(CategoryResource::getUrl()),
+            Stat::make(__('filament.source'), Source::count())->url(SourceResource::getUrl()),
+            Stat::make(__('filament.users'), Advertiser::count())->url(AdvertiserResource::getUrl()),
+            Stat::make(__('filament.live_stream'), LiveStream::count())->url(LiveStreamResource::getUrl()),
         ];
     }
 }

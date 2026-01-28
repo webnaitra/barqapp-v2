@@ -19,7 +19,20 @@ class CountryResource extends Resource
     protected static ?string $model = Country::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-globe-europe-africa';
-    protected static string | \UnitEnum | null $navigationGroup = 'Miscellaneous';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.miscellaneous');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.country');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.countries');
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 

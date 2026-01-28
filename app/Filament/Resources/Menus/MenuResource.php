@@ -19,7 +19,20 @@ class MenuResource extends Resource
     protected static ?string $model = Menu::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-bars-4';
-    protected static string | \UnitEnum | null $navigationGroup = 'Miscellaneous';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.miscellaneous');
+    }
+
+        public static function getModelLabel(): string
+    {
+        return __('filament.menu');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.menus');
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 

@@ -13,32 +13,32 @@ class VideoForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
+                TextInput::make('name')->label(__('filament.name'))
                     ->default(null),
-                FileUpload::make('image')
+                FileUpload::make('image')->label(__('filament.image'))
                     ->image()
                     ->default(null)
                     ->columnSpan(2),
-                Select::make('sources')
+                Select::make('sources')->label(__('filament.sources'))
                     ->relationship(titleAttribute: 'arabic_name')
                     ->searchable()
                     ->preload()
                     ->required(),
-                Select::make('category')
+                Select::make('category')->label(__('filament.category'))
                     ->relationship(titleAttribute: 'arabic_name')
                     ->searchable()
                     ->preload()
                     ->required(),
-                Select::make('countries')
+                Select::make('countries')->label(__('filament.countries'))
                     ->relationship(titleAttribute: 'arabic_name')
                     ->searchable()
                     ->multiple()
                     ->preload()
                     ->columnSpan(2)
                     ->required(),
-                TextInput::make('video')
+                TextInput::make('video')->label(__('filament.video'))
                     ->default(null),
-                TextInput::make('source_link')
+                TextInput::make('source_link')->label(__('filament.source_link'))
                     ->default(null)
                     ->url(),
             ]);

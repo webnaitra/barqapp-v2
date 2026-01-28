@@ -14,25 +14,25 @@ class AffiliateCategoryForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
+                TextInput::make('name')->label(__('filament.name'))
                     ->required(),
-                TextInput::make('slug')
+                TextInput::make('slug')->label(__('filament.slug'))
                     ->required(),
-                TextInput::make('arabic_name')
+                TextInput::make('arabic_name')->label(__('filament.arabic_name'))
                     ->required(),
-                ColorPicker::make('color')
+                ColorPicker::make('color')->label(__('filament.color'))
                     ->default(null),
-                FileUpload::make('image')
+                FileUpload::make('image')->label(__('filament.image'))
                     ->image()
                     ->default(null),
-                TextInput::make('icon_class')
+                TextInput::make('icon_class')->label(__('filament.icon_class'))
                     ->default(null),
-                TextInput::make('order')
+                TextInput::make('order')->label(__('filament.order'))
                     ->numeric()
                     ->default(null),
-                Toggle::make('freeze')
+                Toggle::make('freeze')->label(__('filament.freeze'))
                     ->required(),
-                Toggle::make('featured')
+                Toggle::make('featured')->label(__('filament.featured'))
                     ->required(),
             ]);
     }

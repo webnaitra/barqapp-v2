@@ -35,43 +35,56 @@ class AffiliateResource extends Resource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rocket-launch';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Ads Management';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.ads_management');
+    }
+
+        public static function getModelLabel(): string
+    {
+        return __('filament.affiliate');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.affiliates');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
 
-                TextInput::make('name')
+                TextInput::make('name')->label(__('filament.name'))
                     ->maxLength(255)
                     ->default(null)
                     ->columnSpan(2),
-                FileUpload::make('image')
+                FileUpload::make('image')->label(__('filament.image'))
                     ->image()
                     ->columnSpan(2),
-                TextArea::make('description')
+                TextArea::make('description')->label(__('filament.description'))
                     ->maxLength(255)
                     ->default(null)
                     ->columnSpan(2),
-                TextInput::make('url')
+                TextInput::make('url')->label(__('filament.url'))
                     ->maxLength(255)
                     ->url()
                     ->default(null)
                     ->columnSpan(2),
-                TextInput::make('price')
+                TextInput::make('price')->label(__('filament.price'))
                     ->maxLength(255)
                     ->numeric()
                     ->default(null),
-                TextInput::make('selling_price')
+                TextInput::make('selling_price')->label(__('filament.selling_price'))
                     ->maxLength(191)
                     ->numeric() 
                     ->default(null),
-                Select::make('country_id')
+                Select::make('country_id')->label(__('filament.country_id'))
                     ->relationship('country', 'name')
                     ->searchable()
                     ->preload()
-                    ->label('Country'),
-                Select::make('categories')
+                    ->label(__('filament.country')),
+                Select::make('categories')->label(__('filament.categories'))
                     ->relationship('categories', 'name')
                     ->multiple()
                     ->preload(),
@@ -82,43 +95,43 @@ class AffiliateResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('country.name')
+                TextColumn::make('country.name')->label(__('filament.countryname'))
                     ->sortable(),
-                TextColumn::make('categories.name')
+                TextColumn::make('categories.name')->label(__('filament.categoriesname'))
                     ->sortable(),
-                TextColumn::make('productCategories.name')
+                TextColumn::make('productCategories.name')->label(__('filament.productcategoriesname'))
                     ->sortable(),
-                TextColumn::make('url')
+                TextColumn::make('url')->label(__('filament.url'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('price')
+                TextColumn::make('price')->label(__('filament.price'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('selling_price')
+                TextColumn::make('selling_price')->label(__('filament.selling_price'))
                     ->searchable()
                      ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-            SelectFilter::make('categories')
+            SelectFilter::make('categories')->label(__('filament.categories'))
                 ->relationship('categories', 'name')
                 ->searchable()
                 ->preload(),
-            SelectFilter::make('productCategories')
+            SelectFilter::make('productCategories')->label(__('filament.productcategories'))
                 ->relationship('productCategories', 'name')
                 ->searchable()
                 ->preload(),
-            SelectFilter::make('country')
+            SelectFilter::make('country')->label(__('filament.country'))
                 ->relationship('country', 'name')
                 ->searchable()
                 ->preload(),

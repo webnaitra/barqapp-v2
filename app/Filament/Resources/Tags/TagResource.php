@@ -19,7 +19,20 @@ class TagResource extends Resource
     protected static ?string $model = Tag::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tag';
-    protected static string | \UnitEnum | null $navigationGroup = 'News Management';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.news_management');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.tag');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.tags');
+    }
 
     protected static ?string $recordTitleAttribute = 'tag_name';
 

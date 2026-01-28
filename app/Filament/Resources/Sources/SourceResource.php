@@ -21,7 +21,20 @@ class SourceResource extends Resource
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-globe-alt';
 
     protected static ?string $recordTitleAttribute = 'name';
-    protected static string | \UnitEnum | null $navigationGroup = 'Source Management';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.source_management');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.source');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.sources');
+    }
 
     public static function form(Schema $schema): Schema
     {

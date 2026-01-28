@@ -19,7 +19,20 @@ class VideoResource extends Resource
     protected static ?string $model = Video::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-video-camera';
-    protected static string | \UnitEnum | null $navigationGroup = 'Videos Management';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.videos_management');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.video');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.videos');
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 

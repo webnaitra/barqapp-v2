@@ -18,28 +18,28 @@ class LiveStreamsTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('countries.arabic_name')
-                    ->label('Country')
+                TextColumn::make('countries.arabic_name')->label(__('filament.countriesarabic_name'))
+                    ->label(__('filament.country'))
                     ->sortable(),
-                TextColumn::make('video')
+                TextColumn::make('video')->label(__('filament.video'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('url')
+                TextColumn::make('url')->label(__('filament.url'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('countries')
+                SelectFilter::make('countries')->label(__('filament.countries'))
                 ->relationship('countries', 'arabic_name')
                 ->multiple()
                 ->searchable()

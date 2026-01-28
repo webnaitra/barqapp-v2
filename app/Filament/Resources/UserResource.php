@@ -31,30 +31,43 @@ class UserResource extends Resource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Administration';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.administration');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.user');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.users');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                TextInput::make('name')
+                TextInput::make('name')->label(__('filament.name'))
                     ->required()
                     ->maxLength(255),
-                TextInput::make('email')
+                TextInput::make('email')->label(__('filament.email'))
                     ->email()
                     ->required()
                     ->maxLength(255),
-                TextInput::make('mobile')
+                TextInput::make('mobile')->label(__('filament.mobile'))
                     ->maxLength(255)
                     ->default(null),
-                TextInput::make('nickname')
+                TextInput::make('nickname')->label(__('filament.nickname'))
                     ->maxLength(255)
                     ->default(null),
-                FileUpload::make('image')
+                FileUpload::make('image')->label(__('filament.image'))
                     ->image()
                     ->default(null),
-                DateTimePicker::make('email_verified_at'),
-                TextInput::make('password')
+                DateTimePicker::make('email_verified_at')->label(__('filament.email_verified_at')),
+                TextInput::make('password')->label(__('filament.password'))
                     ->password()
                     ->required()
                     ->maxLength(255),
@@ -65,22 +78,22 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('email')
+                TextColumn::make('email')->label(__('filament.email'))
                     ->searchable(),
-                TextColumn::make('mobile')
+                TextColumn::make('mobile')->label(__('filament.mobile'))
                     ->searchable(),
-                TextColumn::make('nickname')
+                TextColumn::make('nickname')->label(__('filament.nickname'))
                     ->searchable(),
-                TextColumn::make('email_verified_at')
+                TextColumn::make('email_verified_at')->label(__('filament.email_verified_at'))
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

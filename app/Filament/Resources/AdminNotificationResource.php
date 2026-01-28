@@ -30,20 +30,33 @@ class AdminNotificationResource extends Resource
     protected static ?string $model = AdminNotification::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-paper-airplane';
-    protected static string | \UnitEnum | null $navigationGroup = 'Miscellaneous';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.miscellaneous');
+    }
+
+        public static function getModelLabel(): string
+    {
+        return __('filament.admin_notification');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.admin_notifications');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Textarea::make('notify_text')
+                Textarea::make('notify_text')->label(__('filament.notify_text'))
                     ->required()
                     ->columnSpanFull(),
-                TextInput::make('notify_type')
+                TextInput::make('notify_type')->label(__('filament.notify_type'))
                     ->maxLength(255),
-                TextInput::make('notify_url')
+                TextInput::make('notify_url')->label(__('filament.notify_url'))
                     ->maxLength(255),
-                Toggle::make('notify_read')
+                Toggle::make('notify_read')->label(__('filament.notify_read'))
                     ->required(),
             ]);
     }
@@ -52,17 +65,17 @@ class AdminNotificationResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('notify_text')
+                TextColumn::make('notify_text')->label(__('filament.notify_text'))
                     ->searchable(),
-                TextColumn::make('notify_type')
+                TextColumn::make('notify_type')->label(__('filament.notify_type'))
                     ->searchable(),
-                IconColumn::make('notify_read')
+                IconColumn::make('notify_read')->label(__('filament.notify_read'))
                     ->boolean(),
-                TextColumn::make('created_at')
+                TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make('updated_at')->label(__('filament.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

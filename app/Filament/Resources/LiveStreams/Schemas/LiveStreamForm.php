@@ -13,30 +13,30 @@ class LiveStreamForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
+                TextInput::make('name')->label(__('filament.name'))
                     ->default(null)
                     ->maxLength(255)
                     ->columnSpan('full'),
-                TextInput::make('description')
+                TextInput::make('description')->label(__('filament.description'))
                     ->default(null)
                     ->maxLength(255)
                     ->columnSpan('full'),
-                FileUpload::make('image')
+                FileUpload::make('image')->label(__('filament.image'))
                     ->image()
                     ->columnSpan('full'),
-                TextInput::make('video')
+                TextInput::make('video')->label(__('filament.video'))
                     ->default(null)
                     ->url()
                     ->columnSpan('full'),
-                TextInput::make('url')
+                TextInput::make('url')->label(__('filament.url'))
                     ->url()
                     ->default(null)
                     ->columnSpan('full'),
-                Select::make('countries')
+                Select::make('countries')->label(__('filament.countries'))
                     ->relationship('countries', 'arabic_name')
                     ->multiple()
                     ->preload()
-                    ->label('Country')
+                    ->label(__('filament.country'))
                     ->columnSpan('full'),
             ]);
     }

@@ -19,10 +19,20 @@ class NewsResource extends Resource
     protected static ?string $model = News::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-newspaper';
-    protected static string | \UnitEnum | null $navigationGroup = 'News Management';
-    protected static ?string $title = 'News';
-    protected static ?string $modelLabel = 'News';
-    protected static ?string $pluralModelLabel = 'News';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.news_management');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.news');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.news');
+    }
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Schema $schema): Schema

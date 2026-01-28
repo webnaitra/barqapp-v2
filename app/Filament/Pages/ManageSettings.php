@@ -17,7 +17,20 @@ use Filament\Pages\SettingsPage;
 class ManageSettings extends SettingsPage
 {
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-cog-6-tooth';
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.settings');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.settings');
+    }
+
+    public function getTitle(): string
+    {
+        return __('filament.settings');
+    }
 
     protected static string $settings = GeneralSettings::class;
 
@@ -25,57 +38,62 @@ class ManageSettings extends SettingsPage
     {
         return $schema
             ->components([
-                Tabs::make('Settings')
+                Tabs::make('settings')
+                    ->label(__('filament.settings'))
                     ->tabs([
-                        Tab::make('General')
+                        Tab::make('general')
+                            ->label(__('filament.general_settings'))
                             ->schema([
-                                FileUpload::make('app_logo')->label('App Logo')->image()->columnSpanFull(),
-                                FileUpload::make('footer_logo')->label('Footer Logo')->image()->columnSpanFull(),
-                                Textarea::make('footer_text')->label('Footer Text')->columnSpanFull(),
-                                TextInput::make('app_header')->label('App Header')->columnSpanFull(),
-                                Textarea::make('app_download_text')->label('Download Text')->columnSpanFull(),
-                                TextInput::make('copyright')->label('Copyright')->columnSpanFull(),
-                                Textarea::make('newsletter_text')->label('Newsletter Text')->columnSpanFull(),
-                                TextInput::make('app_google_play')->label('Google Play URL')->columnSpanFull(),
-                                TextInput::make('app_app_store')->label('App Store URL')->columnSpanFull(),
+                                FileUpload::make('app_logo')->label(__('filament.app_logo'))->image()->columnSpanFull(),
+                                FileUpload::make('footer_logo')->label(__('filament.footer_logo'))->image()->columnSpanFull(),
+                                Textarea::make('footer_text')->label(__('filament.footer_text'))->columnSpanFull(),
+                                TextInput::make('app_header')->label(__('filament.app_header'))->columnSpanFull(),
+                                Textarea::make('app_download_text')->label(__('filament.download_text'))->columnSpanFull(),
+                                TextInput::make('copyright')->label(__('filament.copyright'))->columnSpanFull(),
+                                Textarea::make('newsletter_text')->label(__('filament.newsletter_text'))->columnSpanFull(),
+                                TextInput::make('app_google_play')->label(__('filament.google_play_url'))->columnSpanFull(),
+                                TextInput::make('app_app_store')->label(__('filament.app_store_url'))->columnSpanFull(),
                             ])
                             ->icon(Heroicon::OutlinedArchiveBox),
                         
-                        Tab::make('Social Media')
+                        Tab::make('social_media')
+                            ->label(__('filament.social_media'))
                             ->schema([
-                                TextInput::make('app_facebook')->label('Facebook')->url()->columnSpanFull(),
-                                TextInput::make('app_twitter')->label('Twitter')->url()->columnSpanFull(),
-                                TextInput::make('app_whatsapp')->label('WhatsApp')->columnSpanFull(),
-                                TextInput::make('app_massenger')->label('Messenger')->columnSpanFull(),
-                                TextInput::make('app_instagram')->label('Instagram')->url()->columnSpanFull(),
-                                TextInput::make('app_youtube')->label('YouTube')->url()->columnSpanFull(),
-                                TextInput::make('app_tiktok')->label('TikTok')->url()->columnSpanFull(),
+                                TextInput::make('app_facebook')->label(__('filament.facebook'))->url()->columnSpanFull(),
+                                TextInput::make('app_twitter')->label(__('filament.twitter'))->url()->columnSpanFull(),
+                                TextInput::make('app_whatsapp')->label(__('filament.whatsapp'))->columnSpanFull(),
+                                TextInput::make('app_massenger')->label(__('filament.messenger'))->columnSpanFull(),
+                                TextInput::make('app_instagram')->label(__('filament.instagram'))->url()->columnSpanFull(),
+                                TextInput::make('app_youtube')->label(__('filament.youtube'))->url()->columnSpanFull(),
+                                TextInput::make('app_tiktok')->label(__('filament.tiktok'))->url()->columnSpanFull(),
                             ])
                             ->icon(Heroicon::OutlinedGlobeEuropeAfrica),
 
-                        Tab::make('Contact Info')
+                        Tab::make('contact_info')
+                            ->label(__('filament.contact_info'))
                             ->schema([
-                                TextInput::make('contact_title')->label('Page Title')->columnSpanFull(),
-                                Textarea::make('contact_introduction')->label('Introduction')->columnSpanFull(),
-                                TextInput::make('contact_form_title')->label('Form Title')->columnSpanFull(),
-                                Textarea::make('contact_form_introduction')->label('Form Intro')->columnSpanFull(),
-                                TextInput::make('contact_address_title')->label('Address Title')->columnSpanFull(),
-                                Textarea::make('contact_address_content')->label('Address')->columnSpanFull(),
-                                TextInput::make('contact_email_title')->label('Email Title')->columnSpanFull(),
-                                TextInput::make('contact_email_content')->label('Email')->columnSpanFull(),
-                                TextInput::make('contact_phone_title')->label('Phone Title')->columnSpanFull(),
-                                TextInput::make('contact_phone_content')->label('Phone')->columnSpanFull(),
+                                TextInput::make('contact_title')->label(__('filament.page_title'))->columnSpanFull(),
+                                Textarea::make('contact_introduction')->label(__('filament.introduction'))->columnSpanFull(),
+                                TextInput::make('contact_form_title')->label(__('filament.form_title'))->columnSpanFull(),
+                                Textarea::make('contact_form_introduction')->label(__('filament.form_intro'))->columnSpanFull(),
+                                TextInput::make('contact_address_title')->label(__('filament.address_title'))->columnSpanFull(),
+                                Textarea::make('contact_address_content')->label(__('filament.address_content'))->columnSpanFull(),
+                                TextInput::make('contact_email_title')->label(__('filament.email_title'))->columnSpanFull(),
+                                TextInput::make('contact_email_content')->label(__('filament.email_content'))->columnSpanFull(),
+                                TextInput::make('contact_phone_title')->label(__('filament.phone_title'))->columnSpanFull(),
+                                TextInput::make('contact_phone_content')->label(__('filament.phone_content'))->columnSpanFull(),
                             ])
                             ->icon(Heroicon::OutlinedEnvelope),
 
-                        Tab::make('Ads & Banners')
+                        Tab::make('ads_banners')
+                            ->label(__('filament.ads_banners'))
                             ->schema([
-                                FileUpload::make('banner_1')->label('Banner 1')->image()->columnSpanFull(),
-                                TextInput::make('banner_1_link')->label('Banner 1 Link')->url()->columnSpanFull(),
-                                FileUpload::make('banner_2')->label('Banner 2')->image()->columnSpanFull(),
-                                TextInput::make('banner_2_link')->label('Banner 2 Link')->url()->columnSpanFull(),
-                                FileUpload::make('banner_3')->label('Banner 3')->image()->columnSpanFull(),
-                                TextInput::make('banner_3_link')->label('Banner 3 Link')->url()->columnSpanFull(),
+                                FileUpload::make('banner_1')->label(__('filament.banner').' 1')->image()->columnSpanFull(),
+                                TextInput::make('banner_1_link')->label(__('filament.banner_link').' 1')->url()->columnSpanFull(),
+                                FileUpload::make('banner_2')->label(__('filament.banner').' 2')->image()->columnSpanFull(),
+                                TextInput::make('banner_2_link')->label(__('filament.banner_link').' 2')->url()->columnSpanFull(),
+                                FileUpload::make('banner_3')->label(__('filament.banner').' 3')->image()->columnSpanFull(),
+                                TextInput::make('banner_3_link')->label(__('filament.banner_link').' 3')->url()->columnSpanFull(),
                             ])
                             ->icon(Heroicon::OutlinedTv),
                     ])->columnSpan('full')

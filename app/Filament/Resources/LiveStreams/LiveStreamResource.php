@@ -19,7 +19,20 @@ class LiveStreamResource extends Resource
     protected static ?string $model = LiveStream::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tv';
-    protected static string | \UnitEnum | null $navigationGroup = 'Videos Management';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.videos_management');
+    }
+
+        public static function getModelLabel(): string
+    {
+        return __('filament.live_stream');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.live_streams');
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 
