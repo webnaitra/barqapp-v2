@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Categories\Tables;
 
+use Filament\Tables\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
@@ -40,6 +41,20 @@ class CategoriesTable
                 //
             ])
             ->recordActions([
+                Action::make('emptyArticles')
+                    ->label(__('filament.empty_articles'))
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->url(fn ($record) => route('category.empty', ['categoryId' => $record->id]))
+                    ->openUrlInNewTab()
+                    ->button()
+                    ->outlined(),
+                Action::make('fetchArticles')
+                    ->label(__('filament.fetch_all_articles'))
+                    ->url(fn ($record) => route('category.cron', ['categoryId' => $record->id]))
+                    ->openUrlInNewTab()
+                    ->button()
+                    ->outlined(),
                 EditAction::make()->button()->outlined(),
                 DeleteAction::make()->button(),
             ])

@@ -17,8 +17,7 @@ use Illuminate\Http\Request;
 use App\Models\SourceFeed;
 use App\Models\Source;
 use App\Models\News;
-use App\Models\News_Category;
-use App\Models\Current_Tags;
+use App\Models\Tag;
 use App\Models\NewsTags;
 
 
@@ -257,25 +256,14 @@ class FetchAllArticles extends Command
                   $post->created_at = $publishedAt ?? $date;
                   $post->updated_at = $date;
                   $post->save();
-                  if($post->save()){
-                     $tags = Current_Tags::get();
-                     $news = \App\Models\News::where('id',$post->id)->first();
-
-                        foreach($tags as $tag){
-                            
-                            
-                            if(str_contains($news->news_title,$tag->tag_name) || str_contains($news->news_content,$tag->tag_name)  ){
-                                    $news_tags = new NewsTags();
-                                    $news_tags->news_id = $post->id;
-                                    $news_tags->tag_id = $tag->id;
-                                    $news_tags->save();
-                                    
-                            }
-                            
-                        }
-                      
-                      
+                  $tags = Tag::all();
+                  $tagIds = [];
+                  foreach ($tags as $tag) {
+                      if (str_contains($post->name, $tag->tag_name) || str_contains($post->content, $tag->tag_name)) {
+                          $tagIds[] = $tag->id;
+                      }
                   }
+                  $post->tags()->attach($tagIds);
                     
                   $post_status = "New";
 

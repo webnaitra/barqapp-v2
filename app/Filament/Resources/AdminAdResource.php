@@ -57,9 +57,13 @@ class AdminAdResource extends Resource
                     ->default(null)->columnSpan(2),
                 FileUpload::make('image')->label(__('filament.image'))
                     ->image()
+                    ->directory('public/files')
+                    ->visibility('public')
                     ->default(null),
-                FileUpload::make('source_icon')->label(__('filament.source_icon'))
+                 FileUpload::make('source_icon')->label(__('filament.source_icon'))
                     ->image()
+                    ->directory('public/files')
+                    ->visibility('public')
                     ->default(null),
                 TextInput::make('fav_count')->label(__('filament.fav_count'))
                     ->required()

@@ -21,7 +21,7 @@
             <tbody>
                 @if(isset($items) && count($items) > 0)
                     @foreach($items as $item)
-                        <tr class="border-b dark:border-gray-700 {{ $loop->even ? 'bg-gray-100 dark:bg-gray-800' : 'bg-white dark:bg-gray-900' }}">
+                        <tr class="border-gray-700 dark:border-gray-700 {{ $loop->even ? 'bg-gray-100 dark:bg-gray-800' : 'bg-white dark:bg-gray-900' }}">
                             <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 {{ $item['title'] ?? 'N/A' }}
                             </td>
@@ -36,7 +36,7 @@
                         </tr>
                     @endforeach
                 @else
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <tr class="bg-white border-gray-700 dark:bg-gray-800 dark:border-gray-700">
                         <td colspan="3" class="px-6 py-4 text-center">
                             {{ __('filament.no_items_found') }}
                         </td>

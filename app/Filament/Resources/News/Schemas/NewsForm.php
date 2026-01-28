@@ -41,8 +41,6 @@ class NewsForm
                     ->image()
                     ->directory('public/files')
                     ->visibility('public')
-                    ->directory('public/files')
-                    ->visibility('public')
                     ->hidden(fn (Get $get) => $get('is_url'))
                     ->columnSpan(2),
                 TextInput::make('editor_image_url')->label(__('filament.image_url'))

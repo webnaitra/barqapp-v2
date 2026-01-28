@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Sources\Tables;
 
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -58,6 +59,20 @@ class SourcesTable
                     ->preload(),
             ],layout: FiltersLayout::AboveContent)
             ->recordActions([
+                Action::make('emptyArticles')
+                    ->label(__('filament.empty_articles'))
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->url(fn ($record) => route('source.empty', ['sourceId' => $record->id]))
+                    ->openUrlInNewTab()
+                    ->button()
+                    ->outlined(),
+                Action::make('fetchArticles')
+                    ->label(__('filament.fetch_all_articles'))
+                    ->url(fn ($record) => route('source.cron', ['sourceId' => $record->id]))
+                    ->openUrlInNewTab()
+                    ->button()
+                    ->outlined(),
                 EditAction::make()->button()->outlined(),
                 DeleteAction::make()->button(),
             ])
