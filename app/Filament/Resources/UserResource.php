@@ -65,6 +65,8 @@ class UserResource extends Resource
                     ->default(null),
                 FileUpload::make('image')->label(__('filament.image'))
                     ->image()
+                    ->directory('public/files')
+                    ->visibility('public')
                     ->default(null),
                 DateTimePicker::make('email_verified_at')->label(__('filament.email_verified_at')),
                 TextInput::make('password')->label(__('filament.password'))

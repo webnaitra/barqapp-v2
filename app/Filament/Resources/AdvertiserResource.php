@@ -83,6 +83,8 @@ class AdvertiserResource extends Resource
                     ->default(null),
                 FileUpload::make('image')->label(__('filament.image'))
                     ->image()
+                    ->directory('public/files')
+                    ->visibility('public')
                     ->default(null),
                 Select::make('sources')->label(__('filament.sources'))
                     ->relationship(name: 'sources', titleAttribute: 'arabic_name')

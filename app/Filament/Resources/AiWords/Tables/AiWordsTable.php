@@ -19,9 +19,9 @@ class AiWordsTable
             ->columns([
                 TextColumn::make('words')->label(__('filament.words'))
                     ->searchable(),
-                TextColumn::make('category.arabic_name')->label(__('filament.categoryarabic_name'))
+                TextColumn::make('category.arabic_name')->label(__('filament.arabic_name'))
                     ->searchable(),
-                TextColumn::make('tags.tag_name')->label(__('filament.tagstag_name'))
+                TextColumn::make('tags.tag_name')->label(__('filament.tags'))
                     ->searchable(),
                 TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()

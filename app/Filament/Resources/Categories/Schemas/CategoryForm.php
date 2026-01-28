@@ -28,6 +28,8 @@ class CategoryForm
                     ->default(null),
                 FileUpload::make('image')->label(__('filament.image'))
                     ->image()
+                    ->directory('public/files')
+                    ->visibility('public')
                     ->default(null)
                     ->columnSpan(2),
                 TextInput::make('icon_class')->label(__('filament.icon_class'))

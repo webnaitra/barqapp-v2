@@ -15,8 +15,4 @@ class LiveStream extends Model
     {
         return $this->belongsToMany(Country::class, 'country_live_stream','live_stream_id','country_id');
     }
-
-    public function media(){
-        return $this->hasOne(Media::class, 'id', 'image');
-    }
 }

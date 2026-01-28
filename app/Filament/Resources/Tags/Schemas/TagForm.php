@@ -19,6 +19,8 @@ class TagForm
                     ->label(__('filament.name')),
                 FileUpload::make('image')->label(__('filament.image'))
                     ->image()
+                    ->directory('public/files')
+                    ->visibility('public')
                     ->default(null)
                     ->columnSpan(2)
                     ->label(__('filament.image')),

@@ -85,15 +85,49 @@ Tabs::make('Tabs')->label(__('filament.tabs'))
                         ->label(__('filament.status')),
                 ])
                 ->extraItemActions([
-                Action::make('testFeed')->label(__('filament.testfeed'))
-                    ->icon(Heroicon::Play)
-                    ->url(function (array $arguments, Repeater $component) {
-                        $itemData = $component->getItemState($arguments['item']);
-                        return $itemData['source_url'];
-                    })
-                    ->openUrlInNewTab()
-                    ->label(__('filament.test_feed')),
+                    Action::make('testFeed')->label(__('filament.test_feed'))
+                        ->icon(Heroicon::Play)
+                        ->modalSubmitAction(false)
+                        ->modalCancelActionLabel(__('filament.close'))
+                        ->modalContent(function (array $arguments, Repeater $component) {
+                            $itemData = $component->getItemState($arguments['item']);
+                            $url = $itemData['source_url'] ?? null;
+                            $items = [];
+                            $error = null;
+                            
+                            if (!$url) {
+                                $error = 'No URL provided';
+                            } else {
+                                $client = new \GuzzleHttp\Client();
+                                try {
+                                    $response = $client->get($url, ['verify' => false]);
+                                    if ($response->getStatusCode() == 200) {
+                                        $data = $response->getBody()->getContents();
+                                        $data = trim($data);
+                                        $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+                                        
+                                        if ($xml && isset($xml->channel->item)) {
+                                            foreach ($xml->channel->item as $item) {
+                                                $items[] = [
+                                                    'title' => (string)$item->title,
+                                                    'date' => (string)$item->pubDate,
+                                                    'link' => (string)$item->link,
+                                                ];
+                                            }
+                                        }
+                                    } else {
+                                        $error = 'Error: ' . $response->getStatusCode();
+                                    }
+                                } catch (\Exception $e) {
+                                    $error = $e->getMessage();
+                                }
+                            }
 
+                            return view('filament.components.feed-preview', [
+                                'items' => $items,
+                                'error' => $error,
+                            ]);
+                        }),
                 ])
                 ->addActionLabel('Add Source Feed')
                 ->columns(2)

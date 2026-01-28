@@ -11,10 +11,6 @@ class Product extends Model
 
     protected $guarded = [];
 
-    public function media(){
-        return $this->hasOne(Media::class, 'id', 'image');
-    }
-    
     public function categories()
     {
         return $this->belongsToMany(ProductCategory::class, 'product_product_category', 'product_id', 'product_category_id');

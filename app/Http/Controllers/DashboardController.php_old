@@ -1,0 +1,421 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Country;
+use App\Models\Category;
+use App\Models\Current_Tags;
+use App\Models\Source;
+use App\Models\Tag;
+use App\Models\SourceFeed;
+use App\Models\SourceType;
+use App\Models\Status;
+use App\Models\Posts;
+use App\Models\Postmeta;
+use App\Models\News;
+use App\Models\NewsTags;
+use App\Models\Countrysource;
+
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Client;
+use Goutte\Client as GoutteClient;
+use Illuminate\Support\Str;
+use Symfony\Component\DomCrawler\Crawler;
+
+
+
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\URL;
+use DateTime;
+use DatePeriod;
+use DateIntercal;
+
+
+class DashboardController extends Controller
+{
+
+    public function country_view ()
+    {
+        return view('pages.country.country-data', [
+            'country' => Country::class
+        ]);
+    }
+
+    public function source_view ()
+    {
+        return view('pages.source.source-data', [
+            'source' => Source::class
+        ]);
+    }
+
+
+    public function source_cron ()
+    {
+        return view('pages.source.source-cron', [
+            'source' => Source::class
+        ]);
+    }
+
+    public function category_view ()
+    {
+        return view('pages.category.category-data', [
+            'category' => Category::class
+        ]);
+    }
+
+    public function category_depends(){
+            
+            if(isset($_GET['cat'])){
+                
+                $cat_id = $_GET['cat'];
+                $data = [];
+                $sub_category = Category::get();
+                foreach($sub_category as $key => $value){
+                    
+                    array_push($data , ['id'=>$value['id'], 'name'=>$value['name'] ]);
+                }
+                
+                 
+            }
+            return $data;
+    }
+    public function sourcefeed_view ()
+    {
+        return view('pages.sourcefeed.sourcefeed-data', [
+            'sourcefeed' => SourceFeed::class
+        ]);
+        
+    }
+
+    public function source_type_view ()
+    {
+        return view('pages.source_type.source_type-data', [
+            'source_type' => SourceType::class
+        ]);
+    }
+    public function status_view ()
+    {
+        return view('pages.user.user-data', [
+            'user' => User::class
+        ]);
+    }
+        
+    function source_test_view(Request $request)
+    {
+		
+
+      if($request->id){
+        $sourceFeed = SourceFeed::where('id', $request->id)->firstOrFail();
+        $url = $sourceFeed->source_url;
+      } else {
+        $url = $request->url;
+      }
+
+      $client = new Client();
+      $response = $client->get($url,['verify' => false]);
+      
+    
+       if( $response->getStatusCode() == 200 ) {
+        $data = $response->getBody()->getContents();
+        
+        $data = trim($data);
+      
+        $mainrespinse = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+        $sourcefeed = array();
+        foreach ($mainrespinse->channel as $item) {
+          $sourcefeed['id'] = $item->pubDate;
+          $sourcefeed['title'] = $item->title;
+          $sourcefeed['content'] = $item->description;
+        }
+         //dd($mainrespinse->channel->item);
+         //echo $id;
+         //  echo   $id = base64_decode($id);
+         //   $sourcefeed = SourceFeed::where('id',$id)->firstOrFail();
+        //   return view('pages.sourcefeed.sources-data', compact('sourcefeed'));
+       } else{
+           echo "please enter valid url!";
+       }
+        return view('pages.source.sources-data', compact('mainrespinse'));
+            //    }
+          //  catch (exception $e) {
+          //     echo "Error ";
+          //  }
+        
+    }
+
+    public function cron_article(){
+        $newsId = request('id');
+        
+        if(isset($newsId) && !empty($newsId)){
+            $news = News::find($newsId);
+               
+            if($news){
+                $start_time = microtime(true);
+                
+                $client = new GoutteClient();
+                $the_site = extract_url($news->source_link);
+                $data = $client->request('GET', $the_site);
+                $source = Source::where('id', $news->source_id )->first();
+
+                if($source){
+
+                    
+                    $content_classes = $source->content_classes;
+                    $filtered_classes = $source->filter_classes;
+                    $image_classes = $source->image_classes;
+                    $html = '';
+
+
+                /*** Convert the selected content into html ***/
+                    if(!empty($content_classes)){
+                        $elements = $data->filter($content_classes)->each(function($node){
+                            return $node->html();
+                        });
+
+                        $elements = implode(' ', $elements);
+                        $data = new Crawler($elements);
+                    
+                    }
+
+                    /*** Removes the filtered classes from the content ***/
+                    if(!empty($filtered_classes)){
+                        $data->filter($filtered_classes)->each(function($crawler){
+                            foreach ($crawler as $node) {
+                                $node->parentNode->removeChild($node);
+                            }
+                        });
+    
+                    }
+
+                /*** Remove images inside links ***/
+                    $data->filter('a')->each(function($node){
+                        $domNode = $node->getNode(0);
+                        if ($domNode && $domNode->parentNode && $domNode->firstChild == 'img') {
+                            $domNode->parentNode->removeChild($domNode);
+                        }
+                    });
+
+                 $data->filter('img, figure, script, style, noscript')->each(function($node){
+                        $domNode = $node->getNode(0);
+                        if ($domNode && $domNode->parentNode) {
+                            $domNode->parentNode->removeChild($domNode);
+                        }
+                    });
+
+                    $html = $data->html();
+    
+                    /*** Check for youtube Video ***/
+                        $youtube = $data->filterXPath("//iframe")->each(function($node){
+                            $src = $node->attr('src');
+    
+                            if(!empty($src)){
+                                $parse = parse_url($src);
+                                $host = $parse["host"];
+                                $host = str_ireplace("www.", "", $host);
+                                if ($host == "youtube.com") {
+                                    return $src;
+                                } 
+                            }
+    
+    
+                            return false;
+                            
+                        });
+    
+                        $youtube = array_filter($youtube);
+    
+                        if(isset($youtube[0]) && !empty($youtube[0])){
+                            $news->news_video = $youtube[0];
+                            $news->is_updated = 1;
+                        }
+
+    
+                    /*** Check for the Og image ***/
+    
+                    $year = date('Y');
+                    $month = date('m');
+                    $day = date('d');
+                    $arrContextOptions=array(
+                        "ssl" => array(
+                            "verify_peer" => false,
+                            "verify_peer_name" => false,
+                        ),
+                    ); 
+    
+                    /*** Extract main image from the articles */
+                    $img_source = null;
+
+                    // First, try to get image from custom selector if provided
+                    if(!empty($image_classes)){
+                        $imageNode = $data->filter($image_classes)->first();
+                        
+                        if ($imageNode->count() > 0) {
+                            $domNode = $imageNode->getNode(0);
+                            
+                            // Check if it's an img tag
+                            if ($domNode->nodeName === 'img') {
+                                $img_source = $imageNode->attr('src');
+                            } 
+                            // Check if it's a figure containing an img
+                            elseif ($domNode->nodeName === 'figure') {
+                                $figureImg = $imageNode->filter('img')->first();
+                                if ($figureImg->count() > 0) {
+                                    $img_source = $figureImg->attr('src');
+                                }
+                            }
+                            // For other elements (like div), look for img inside
+                            else {
+                                $innerImg = $imageNode->filter('img')->first();
+                                if ($innerImg->count() > 0) {
+                                    $img_source = $innerImg->attr('src');
+                                }
+                            }
+                            
+                            // Remove the node after extracting the image
+                            if ($domNode && $domNode->parentNode) {
+                                $domNode->parentNode->removeChild($domNode);
+                            }
+                        }
+                    }
+
+                    // If no image from custom selector, try first figure in content
+                    if (empty($img_source)) {
+                        $firstFigure = $data->filter('figure')->first();
+                        if ($firstFigure->count() > 0) {
+                            $figureImg = $firstFigure->filter('img')->first();
+                            if ($figureImg->count() > 0) {
+                                $img_source = $figureImg->attr('src');
+                                
+                                // Remove the figure after extracting
+                                $figureNode = $firstFigure->getNode(0);
+                                if ($figureNode && $figureNode->parentNode) {
+                                    $figureNode->parentNode->removeChild($figureNode);
+                                }
+                            }
+                        }
+                    }
+
+                    // If still no image, get first img in the content
+                    if (empty($img_source)) {
+                        $firstImg = $data->filter('img')->first();
+                        if ($firstImg->count() > 0) {
+                            $img_source = $firstImg->attr('src');
+                            
+                            // Remove the img after extracting
+                            $imgNode = $firstImg->getNode(0);
+                            if ($imgNode && $imgNode->parentNode) {
+                                $imgNode->parentNode->removeChild($imgNode);
+                            }
+                        }
+                    }
+
+                    // Fallback to og:image if nothing found
+                    if (empty($img_source)) {
+                        $img_source = $data->filterXPath("//meta[@property='og:image']")->count() 
+                            ? $data->filterXPath("//meta[@property='og:image']")->attr('content') 
+                            : null;
+                    }
+                    
+                    if(!empty($img_source)){
+                        
+                        // if(str_contains($img_source, 'https://cdn4.premiumread.com')){
+                        //     $img_source_query = parse_url($img_source, PHP_URL_QUERY);
+                        //     parse_str($img_source_query, $img_source_params);
+                        //     $img_source = $img_source_params['url'];
+                        // }
+
+                        // $img_source_path_info = pathinfo(parse_url($img_source)['path']);
+                        // if(isset($img_source_path_info['extension']) && isset($img_source_path_info['filename'])){
+                        //     $img_source_extension = $img_source_path_info['extension'];
+                        //     $img_source_filename = Str::slug($img_source_path_info['filename'], '-');
+
+                        //     $img_content = file_get_contents($img_source);
+                        //     $now = Carbon::now();
+                        //     $now->year;
+                        //     $now->month;
+                        //     $news_image_dir = '/public_html/storage/app/public/images/'.$now->year.'/'.$now->month.'/';
+                        //     $news_image_path = '/public_html/storage/app/public/images/'.$now->year.'/'.$now->month.'/'.$newsId.'-'.$img_source_filename.'.'.$img_source_extension;
+                        //     $news_image_path_db = env('DASHBOARD_IMAGE_URI').'/images/'.$now->year.'/'.$now->month.'/'.$newsId.'-'.$img_source_filename.'.'.$img_source_extension;
+                        //     Storage::disk('sftp')->put($news_image_path, $img_content);
+                        //     Storage::disk('sftp')->setVisibility($news_image_dir, 'public');
+                        $needle = "/100/56";
+                        $replacement = "/900/506";
+                                                    
+                        if (strpos($url, 'skynewsarabia.com') !== false) {
+                            $newUrl = str_replace($needle, $replacement, $url);
+                        } else {
+                            $newUrl = $url; // Keep original URL
+                        }
+
+                            $news->image = $img_source;
+                            $news->is_updated = 1;
+                            
+                        // }
+                    }
+    
+                    if(!empty($html)){
+                        
+                        
+                        //Log::info('News ID: '. $newsId . ', News Title: '.$news->news_title );
+                        $news->content = $html;
+                        $news->is_updated = 1;
+                        
+                    }
+    
+                    $news->save();
+
+                    $keywords = Current_Tags::pluck('tag_name')->all();
+                    $tags_to_assign = $this->extract_keywords($html, $keywords);
+                    
+                    foreach($tags_to_assign as $tag_name=>$tag_id){
+                        $tag = Current_Tags::where('tag_name', $tag_name)->first();
+                        $news_tags = new NewsTags();
+                        $news_tags->news_id = $news->id;
+                        $news_tags->tag_id = $tag->id;
+                        $news_tags->save();
+                    }
+                    $time_elapsed_secs = microtime(true) - $start_time;
+                    return 1;
+                }
+            }
+                
+        }      
+        
+        return 0;
+    }
+
+    public function extract_keywords($html, $keywords) {
+        // Convert the HTML to plain text
+        $text = strip_tags($html);
+        
+    
+        // Convert the text to lowercase
+        $text = mb_strtolower($text);
+        //dd($text);
+        // Initialize an array to hold the matches
+        $matches = [];
+        
+        // Loop through the keywords
+        foreach ($keywords as $keyword) {
+            // Convert the keyword to lowercase
+            $keywordLower = mb_strtolower($keyword);
+    
+            // Check if the keyword is in the text
+            if (mb_strpos($text, $keywordLower) !== false) {
+                // If the keyword is in the text, add it to the matches
+    
+                $matches[$keyword] = substr_count($text, $keywordLower);
+            }
+        }
+        arsort($matches);
+        // Return the matches
+        return $matches;
+    }
+}

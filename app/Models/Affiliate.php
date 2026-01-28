@@ -18,10 +18,6 @@ class Affiliate extends Model
         static::addGlobalScope(new AffiliateFilterScope);
     }
 
-    public function media(){
-        return $this->hasOne(Media::class, 'id', 'image');
-    }
-    
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'affiliate_categories', 'affiliate_id', 'category_id');

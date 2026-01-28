@@ -24,6 +24,8 @@ class AffiliateCategoryForm
                     ->default(null),
                 FileUpload::make('image')->label(__('filament.image'))
                     ->image()
+                    ->directory('public/files')
+                    ->visibility('public')
                     ->default(null),
                 TextInput::make('icon_class')->label(__('filament.icon_class'))
                     ->default(null),

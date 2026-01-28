@@ -259,11 +259,11 @@ class WebApiController extends Controller
 
         $videos = Video::select('id','name', 'source_id', 'video')->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
         ->orderBy('source_rank', 'asc')->orderBy('created_at', 'desc')->take(4)->get();
-        $products = Affiliate::with('media')->select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get();
+        $products = Affiliate::select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get();
         $topNews = News::with(['category'])->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')->latest()->take(4)->get();
-        $ads = AdminAd::with('media')->where('type', 'column')->take(4)->inRandomOrder()->get();
-        $fullAds = AdminAd::with('media', 'source_media')->where('type', 'full')->take(4)->inRandomOrder()->get();
-        $affiliates = Affiliate::with('media')->take(4)->get();
+        $ads = AdminAd::where('type', 'column')->take(4)->inRandomOrder()->get();
+        $fullAds = AdminAd::where('type', 'full')->take(4)->inRandomOrder()->get();
+        $affiliates = Affiliate::take(4)->get();
 
         if($user){
             $featured_categories = array();
@@ -352,9 +352,9 @@ class WebApiController extends Controller
                 ->limit(10)
                 ->get();
 
-            $ads = AdminAd::with('media')->where('type', 'column')->take(4)->inRandomOrder()->get();
-            $fullAds = AdminAd::with('media')->where('type', 'full')->take(4)->inRandomOrder()->get();
-            $products = Affiliate::with('media')->select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get();
+            $ads = AdminAd::where('type', 'column')->take(4)->inRandomOrder()->get();
+            $fullAds = AdminAd::where('type', 'full')->take(4)->inRandomOrder()->get();
+            $products = Affiliate::select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get();
 
 
 
@@ -635,9 +635,9 @@ class WebApiController extends Controller
                 $news->related_news = $news->related_news;
             });
 
-            $ads = AdminAd::with('media')->where('type', 'column')->take(4)->inRandomOrder()->get();
-            $fullAds = AdminAd::with('media')->where('type', 'full')->take(4)->inRandomOrder()->get();
-            $products = Affiliate::with('media')->select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get();
+            $ads = AdminAd::where('type', 'column')->take(4)->inRandomOrder()->get();
+            $fullAds = AdminAd::where('type', 'full')->take(4)->inRandomOrder()->get();
+            $products = Affiliate::select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get();
 
 
 
@@ -667,12 +667,12 @@ class WebApiController extends Controller
             $news = [];
             $final_array = array();
             $categories = array();
-            $ads = $category->ads()->with('media')->where('type', 'column')->take(4)->inRandomOrder()->get();
-            $fullAds = $category->ads()->with('media')->where('type', 'full')->take(4)->inRandomOrder()->get();
-            $affiliates = $category->affiliates()->with('media')->take(4)->get();
+            $ads = $category->ads()->where('type', 'column')->take(4)->inRandomOrder()->get();
+            $fullAds = $category->ads()->where('type', 'full')->take(4)->inRandomOrder()->get();
+            $affiliates = $category->affiliates()->take(4)->get();
 
             $tags = $category->keywords()
-                ->with('media', 'countries')
+                ->with('countries')
                 ->select('id', 'keyword_name','short_description', 'description', 'image')
                 ->orderBy('id', 'desc')
                 ->get();
@@ -770,7 +770,7 @@ class WebApiController extends Controller
 
                 $final_array = array(
                     'news' => $news,
-                    'affiliates' => Affiliate::with('media')->select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get(),
+                    'affiliates' => Affiliate::select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get(),
                     'source' => $source->arabic_name,
                     'source_icon' => $source->logo_url,
                     'source_follower' => $source->followers,
@@ -967,7 +967,6 @@ class WebApiController extends Controller
 
             $category = Category::where('id', $news->category_id)->firstOrFail();
             $affiliates = $category->affiliates()
-                ->with(['media'])
                 ->select('affiliates.id', 'affiliates.name', 'affiliates.url', 'affiliates.price', 'affiliates.image')
                 ->inRandomOrder()
                 ->take(4)
@@ -1066,7 +1065,7 @@ class WebApiController extends Controller
         $finalArray = [
             'news' => $news,
             'single_ad' => $ads['single_ad'],
-            'affiliates' => Affiliate::with('media')->select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get(),
+            'affiliates' => Affiliate::select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get(),
         ];
 
 
@@ -2403,7 +2402,7 @@ public function getUserFavorites()
     {
         try {
             $countryCode = request()->country;
-            $query = LiveStream::with('media')->select('id', 'name', 'image', 'description', 'video', 'url');
+            $query = LiveStream::select('id', 'name', 'image', 'description', 'video', 'url');
 
             if (!empty($countryCode)) {
                 $country = Country::where('country_code', $countryCode)->first();
@@ -2549,8 +2548,7 @@ public function getUserFavorites()
         if (empty($keyword)) {
             return $this->missingParameter();
         }
-        $keywordInfo = Keyword::with('media')
-            ->select('id', 'keyword_name', 'description', 'image')
+        $keywordInfo = Keyword::select('id', 'keyword_name', 'description', 'image')
             ->where('keyword_name', $keyword)
             ->first();
 
@@ -2591,7 +2589,7 @@ public function getUserFavorites()
 
 
         $news = $news->distinct('slug')->take(10)->paginate(10);
-        $fullAds = AdminAd::with('media')->where('type', 'full')->take(4)->inRandomOrder()->get();
+        $fullAds = AdminAd::where('type', 'full')->take(4)->inRandomOrder()->get();
 
 
 

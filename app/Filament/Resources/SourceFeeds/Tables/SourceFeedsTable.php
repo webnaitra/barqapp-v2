@@ -24,10 +24,10 @@ class SourceFeedsTable
                     ->searchable(),
                 TextColumn::make('source_url')->label(__('filament.source_url'))
                     ->searchable(),
-                TextColumn::make('source.arabic_name')->label(__('filament.sourcearabic_name'))
+                TextColumn::make('source.arabic_name')->label(__('filament.arabic_name'))
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('category.arabic_name')->label(__('filament.categoryarabic_name'))
+                TextColumn::make('category.arabic_name')->label(__('filament.arabic_name'))
                     ->numeric()
                     ->sortable(),
                 IconColumn::make('status_id')->label(__('filament.status_id'))->label(__('filament.valid_url'))
@@ -60,14 +60,47 @@ class SourceFeedsTable
                     ]),
             ],  layout: FiltersLayout::AboveContent)
             ->recordActions([
-                Action::make('edit')->label(__('filament.edit'))
-                ->label(__('filament.test'))
-                ->icon('heroicon-o-play')
-                ->button()
-                ->outlined()
-                ->url(fn ( $record ) => url('#'))
-                ->color('gray')
-                ->openUrlInNewTab(),
+                Action::make('testFeed')
+                    ->label(__('filament.test_feed'))
+                    ->icon('heroicon-o-play')
+                    ->button()
+                    ->outlined()
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel(__('filament.close'))
+                    ->modalContent(function (\App\Models\SourceFeed $record) {
+                        $url = $record->source_url;
+                        $items = [];
+                        $error = null;
+                        
+                        $client = new \GuzzleHttp\Client();
+                        try {
+                            $response = $client->get($url, ['verify' => false]);
+                            if ($response->getStatusCode() == 200) {
+                                $data = $response->getBody()->getContents();
+                                $data = trim($data);
+                                $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+                                
+                                if ($xml && isset($xml->channel->item)) {
+                                    foreach ($xml->channel->item as $item) {
+                                        $items[] = [
+                                            'title' => (string)$item->title,
+                                            'date' => (string)$item->pubDate,
+                                            'link' => (string)$item->link,
+                                        ];
+                                    }
+                                }
+                            } else {
+                                $error = 'Error: ' . $response->getStatusCode();
+                            }
+                        } catch (\Exception $e) {
+                            $error = $e->getMessage();
+                        }
+
+                        return view('filament.components.feed-preview', [
+                            'items' => $items,
+                            'error' => $error,
+                        ]);
+                    }),
                 EditAction::make()->button()->outlined(),
                 DeleteAction::make()->button(),
                 

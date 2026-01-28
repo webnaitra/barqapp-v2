@@ -28,7 +28,7 @@ class Tag extends Model
      * @return array
      */
     public function media(){
-        return $this->hasOne(Media::class, 'id', 'image');
+        return $this->belongsTo(Media::class, 'id', 'image');
      }
 
 }

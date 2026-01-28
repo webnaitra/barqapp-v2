@@ -27,8 +27,33 @@ class NewsForm
                     ->live(onBlur: true)
                     ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
                 TextInput::make('slug')->label(__('filament.slug')),
-                FileUpload::make('image')->label(__('filament.image'))
-                    ->image()->columnSpan(2),
+                Toggle::make('is_url')->label(__('filament.use_url'))
+                    ->live()
+                    ->offIcon('heroicon-o-arrow-up-tray')
+                    ->onIcon('heroicon-o-link')
+                    ->afterStateHydrated(function (Toggle $component, $state, $record) {
+                        if ($record && str_starts_with($record->image, 'http')) {
+                            $component->state(true);
+                        }
+                    })
+                    ->dehydrated(false),
+                FileUpload::make('image')->label(__('filament.upload_image'))
+                    ->image()
+                    ->directory('public/files')
+                    ->visibility('public')
+                    ->directory('public/files')
+                    ->visibility('public')
+                    ->hidden(fn (Get $get) => $get('is_url'))
+                    ->columnSpan(2),
+                TextInput::make('editor_image_url')->label(__('filament.image_url'))
+                    ->visible(fn (Get $get) => $get('is_url'))
+                    ->url()
+                    ->columnSpan(2)
+                    ->afterStateHydrated(function (TextInput $component, $state, $record) {
+                        if ($record && str_starts_with($record->image, 'http')) {
+                            $component->state($record->image);
+                        }
+                    }),
                 Textarea::make('excerpt')->label(__('filament.excerpt'))
                     ->required()
                     ->columnSpan(2),

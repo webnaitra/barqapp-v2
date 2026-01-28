@@ -32,11 +32,11 @@ class Adsense extends Model
      */
         
     public function location(){
-        return $this->hasOne(Location::class);
+        return $this->belongsTo(Location::class);
     }
 
         public function category(){
-        return $this->hasOne(Category::class);
+        return $this->belongsTo(Category::class);
     }
 
 }

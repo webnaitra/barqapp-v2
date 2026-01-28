@@ -33,11 +33,11 @@ class News extends Model
      * Get all of the posts that are assigned this tag.
      */
     public function category(){
-        return $this->hasOne(Category::class, 'id', 'category_id');
+        return $this->belongsTo(Category::class, 'category_id');
      }
 
     public function favorites_list(){
-        return $this->belongsTo(Favorite::class, 'id', 'fav_news_id');        
+        return $this->belongsTo(Favorite::class, 'fav_news_id');        
     }
 
     /**

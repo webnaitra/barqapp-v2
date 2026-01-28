@@ -23,6 +23,8 @@ class LiveStreamForm
                     ->columnSpan('full'),
                 FileUpload::make('image')->label(__('filament.image'))
                     ->image()
+                    ->directory('public/files')
+                    ->visibility('public')
                     ->columnSpan('full'),
                 TextInput::make('video')->label(__('filament.video'))
                     ->default(null)

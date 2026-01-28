@@ -29,14 +29,7 @@ class Keyword extends Model
      * @var array
      */
 
-    /**
-     * Get the list of tags attached to the article.
-     *
-     * @return array
-     */
-    public function media(){
-        return $this->hasOne(Media::class, 'id', 'image');
-    }
+
 
     public function users()
     {
@@ -64,7 +57,7 @@ class Keyword extends Model
 
     public function category()
     {
-        return $this->hasOne(Category::class, 'id', 'category_id');
+        return $this->belongsTo(Category::class, 'id', 'category_id');
     }
 
     public function countries()

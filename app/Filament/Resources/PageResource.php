@@ -57,6 +57,8 @@ class PageResource extends Resource
                     ->columnSpanFull(),
                 FileUpload::make('image')->label(__('filament.image'))
                     ->image()
+                    ->directory('public/files')
+                    ->visibility('public')
                     ->default(null),
             ]);
     }

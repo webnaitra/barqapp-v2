@@ -61,6 +61,8 @@ class AffiliateResource extends Resource
                     ->columnSpan(2),
                 FileUpload::make('image')->label(__('filament.image'))
                     ->image()
+                    ->directory('public/files')
+                    ->visibility('public')
                     ->columnSpan(2),
                 TextArea::make('description')->label(__('filament.description'))
                     ->maxLength(255)

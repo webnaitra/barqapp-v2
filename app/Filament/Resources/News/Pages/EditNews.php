@@ -16,4 +16,14 @@ class EditNews extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        if (isset($data['editor_image_url'])) {
+            $data['image'] = $data['editor_image_url'];
+            unset($data['editor_image_url']);
+        }
+
+        return $data;
+    }
 }

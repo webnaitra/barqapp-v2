@@ -17,6 +17,8 @@ class VideoForm
                     ->default(null),
                 FileUpload::make('image')->label(__('filament.image'))
                     ->image()
+                    ->directory('public/files')
+                    ->visibility('public')
                     ->default(null)
                     ->columnSpan(2),
                 Select::make('sources')->label(__('filament.sources'))

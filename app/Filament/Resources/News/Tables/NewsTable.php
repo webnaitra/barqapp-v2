@@ -25,18 +25,18 @@ class NewsTable
             ->columns([
                 TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('category.arabic_name')->label(__('filament.categoryarabic_name'))
+                TextColumn::make('category.arabic_name')->label(__('filament.arabic_name'))
                     ->sortable(),
-                TextColumn::make('sources.arabic_name')->label(__('filament.sourcesarabic_name'))
+                TextColumn::make('sources.arabic_name')->label(__('filament.arabic_name'))
                     ->sortable(),
                 TextColumn::make('date')->label(__('filament.date'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('tags.tag_name')->label(__('filament.tagstag_name'))
+                TextColumn::make('tags.tag_name')->label(__('filament.tags'))
                     ->sortable()
                     ->label(__('filament.tags'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('keywords.keyword_name')->label(__('filament.keywordskeyword_name'))
+                TextColumn::make('keywords.keyword_name')->label(__('filament.keyword_name'))
                     ->sortable()
                     ->label(__('filament.keywords'))
                     ->toggleable(isToggledHiddenByDefault: true),

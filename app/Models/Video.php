@@ -35,9 +35,6 @@ class Video extends Model
         static::addGlobalScope(new VideoFilterScope);
     }
 
-    public function media(){
-        return $this->hasOne(Media::class, 'id', 'image');
-    }
 
     /**
      * Get all of the posts that are assigned this tag.
