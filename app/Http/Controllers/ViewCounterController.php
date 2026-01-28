@@ -3,14 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Affiliate;
-use App\Models\AdminAd;
-use App\Models\Video;
 
 class ViewCounterController extends Controller
 {
-    
-    public function affiliate($id)
+     public function affiliate($id)
     {
         $id = base64_decode($id);
         $affiliate = Affiliate::findOrFail($id);

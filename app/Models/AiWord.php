@@ -4,9 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Aiword extends Model
+class AiWord extends Model
 {
 
+    protected $table = 'aiwords';
     /**
      * The attributes that are mass assignable.
      *

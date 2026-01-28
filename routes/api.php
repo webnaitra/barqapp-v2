@@ -2,8 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\WebApiController;
-use App\Http\Controllers\Api\MobileApiController;
+use App\Http\Controllers\API\WebApiController;
+use App\Http\Controllers\API\MobileApiController;
+use App\Http\Controllers\API\AuthController;
 use App\Http\Middleware\LogIncomingRequests;
 
 /*
@@ -21,18 +22,18 @@ use App\Http\Middleware\LogIncomingRequests;
 //     return $request->user();
 // });
 
-Route::any('/register', 'Api\AuthController@register');
-Route::any('/loginAuth', 'Api\AuthController@login');
+Route::any('/register', [AuthController::class, 'register']);
+Route::any('/loginAuth', [AuthController::class, 'login']);
 // Route::any('/test', 'Api\ApiController@test')->middleware('auth:api');
 //Route::any('/signup', 'Api\ApiController@signup')->middleware('auth:api');
-Route::any('/signup', 'Api\ApiController@signup');
+Route::any('/signup', [AuthController::class, 'signup']);
 //Route::any('/activateAccount', 'Api\ApiController@activateAccount')->middleware('auth:api');
 //Route::any('/activateAccount', 'Api\ApiController@activateAccount');
 //Route::any('/login', 'Api\ApiController@login')->middleware('auth:api');
-Route::any('/login', 'Api\ApiController@login');
+Route::any('/login', [AuthController::class, 'login']);
 //Route::any('/resendActivationCode', 'Api\ApiController@resendActivationCode')->middleware('auth:api');
-Route::any('/forgotPassword', 'Api\ApiController@forgotPassword');
-Route::any('/resetPassword', 'Api\ApiController@resetPassword');
+Route::any('/forgotPassword', [AuthController::class, 'forgotPassword']);
+Route::any('/resetPassword', [AuthController::class, 'resetPassword']);
 
 /*********** Routes for Web App ******************/
 Route::get('/web/getServer', [WebApiController::class, 'getServer'])->name('api.web.getServer');
@@ -137,43 +138,42 @@ Route::prefix('mobile/v1')->middleware(['log_api_requests'])->group(function () 
 /*********** End Routes for Mobile App ********/
 
 Route::middleware('auth:api')->group(function () {
-    Route::any('/homepage', 'Api\ApiController@homepage');
-    Route::any('/save_contactus', 'Api\ApiController@saveContactUs');
-    Route::any('/ads_areas', 'Api\ApiController@ads_areas');
+    Route::any('/homepage', [ApiController::class, 'homepage']);
+    Route::any('/save_contactus', [ApiController::class, 'saveContactUs']);
+    Route::any('/ads_areas', [ApiController::class, 'ads_areas']);
 
-    Route::any('/getMainCategories', 'Api\ApiController@getMainCategories');
-    Route::any('/HomePageCategory', 'Api\ApiController@HomePageCategory');
+    Route::any('/getMainCategories', [ApiController::class, 'getMainCategories']);
+    Route::any('/HomePageCategory', [ApiController::class, 'HomePageCategory']);
+    Route::any('/getFooterMenu', [ApiController::class, 'getFooterMenu']);
+    Route::any('/getAdsense', [ApiController::class, 'getAdsense']);
+    Route::any('/getNews', [ApiController::class, 'getNews']);
+    Route::any('/SearchNews', [ApiController::class, 'SearchNews']);
+    Route::any('/increaseViews', [ApiController::class, 'increaseViews']);
+    Route::any('/subscribeToNewsletter', [ApiController::class, 'subscribeToNewsletter']);
+    Route::any('/subscribeToWhatsapp', [ApiController::class, 'subscribeToWhatsapp']);
+    Route::any('/getMobileNews', [ApiController::class, 'getMobileNews']);
+    Route::any('/updateNotificationSettings', [ApiController::class, 'updateNotificationSettings']);
+    Route::any('/getNotificationSettings', [ApiController::class, 'getNotificationSettings']);
+    Route::any('/getTerms', [ApiController::class, 'getTerms']);
+    Route::any('/getPage', [ApiController::class, 'getPage']);
+    Route::any('/getUserRates', [ApiController::class, 'getUserRates']);
+    Route::any('/addInterest', [ApiController::class, 'addInterest']);
+    Route::any('/getInterests', [ApiController::class, 'getInterests']);
+    Route::any('/aboutApp', [ApiController::class, 'aboutApp']);
+    Route::any('/appIntroduction', [ApiController::class, 'appIntroduction']);
+    Route::any('/appPrivacy', [ApiController::class, 'appPrivacy']);
+    Route::any('/deleteInterest', [ApiController::class, 'deleteInterest']);
+    Route::any('/getMenu', [ApiController::class, 'getMenu']);
+    Route::any('/appTerms', [ApiController::class, 'appTerms']);
+    Route::any('/getUserData', [ApiController::class, 'getUserData']);
+    Route::any('/updateProfile', [ApiController::class, 'updateProfile']);
+    Route::any('/getSettings', [ApiController::class, 'getSettings']);
+    Route::any('/addUserFavorite', [ApiController::class, 'addUserFavorite']);
+    Route::any('/deleteUserFavorite', [ApiController::class, 'deleteUserFavorite']);
+    Route::any('/getPhonesRates', [ApiController::class, 'getPhonesRates']);
+    Route::any('/changeLang', [ApiController::class, 'changeLang']);
 
-    Route::any('/getFooterMenu', 'Api\ApiController@getFooterMenu');
-    Route::any('/getAdsense', 'Api\ApiController@getAdsense');
-    Route::any('/getNews', 'Api\ApiController@getNews');
-    Route::any('/SearchNews', 'Api\ApiController@SearchNews');
-    Route::any('/increaseViews', 'Api\ApiController@increaseViews');
-    Route::any('/subscribeToNewsletter', 'Api\ApiController@subscribeToNewsletter');
-    Route::any('/subscribeToWhatsapp', 'Api\ApiController@subscribeToWhatsapp');
-    Route::any('/getMobileNews', 'Api\ApiController@getMobileNews');
-    Route::any('/updateNotificationSettings', 'Api\ApiController@updateNotificationSettings');
-    Route::any('/getNotificationSettings', 'Api\ApiController@getNotificationSettings');
-    Route::any('/getTerms', 'Api\ApiController@getTerms');
-    Route::any('/getPage', 'Api\ApiController@getPage');
-    Route::any('/getUserRates', 'Api\ApiController@getUserRates');
-    Route::any('/addInterest', 'Api\ApiController@addInterest');
-    Route::any('/getInterests', 'Api\ApiController@getInterests');
-    Route::any('/aboutApp', 'Api\ApiController@aboutApp');
-    Route::any('/appIntroduction', 'Api\ApiController@appIntroduction');
-    Route::any('/appPrivacy', 'Api\ApiController@appPrivacy');
-    Route::any('/deleteInterest', 'Api\ApiController@deleteInterest');
-    Route::any('/getMenu', 'Api\ApiController@getMenu');
-    Route::any('/appTerms', 'Api\ApiController@appPrivacy');
-    Route::any('/getUserData', 'Api\ApiController@getUserData');
-    Route::any('/updateProfile', 'Api\ApiController@updateProfile');
-    Route::any('/getSettings', 'Api\ApiController@getSettings');
-    Route::any('/addUserFavorite', 'Api\ApiController@addUserFavorite');
-    Route::any('/deleteUserFavorite', 'Api\ApiController@deleteUserFavorite');
-    Route::any('/getPhonesRates', 'Api\ApiController@getPhonesRates');
-    Route::any('/changeLang', 'Api\ApiController@changeLang');
+    Route::any('/getUserNotificationsCount', [ApiController::class, 'getUserNotificationsCount']);
 
-    Route::any('/getUserNotificationsCount', 'Api\ApiController@getUserNotificationsCount');
-
-    Route::any('/getSocialLinks', 'Api\ApiController@getSocialLinks');
+    Route::any('/getSocialLinks', [ApiController::class, 'getSocialLinks']);
 });
