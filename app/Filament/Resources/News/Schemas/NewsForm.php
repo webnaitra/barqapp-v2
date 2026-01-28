@@ -23,20 +23,20 @@ class NewsForm
             ->components([
                 TextInput::make('name')
                     ->required()
-                    ->maxLength(191)
+                    ->maxLength(255)
                     ->live(onBlur: true)
                     ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
                 TextInput::make('slug'),
                 FileUpload::make('image')
                     ->image()->columnSpan(2),
-                TextInput::make('excerpt')
+                Textarea::make('excerpt')
                     ->required()
-                    ->maxLength(191)->columnSpan(2),
+                    ->columnSpan(2),
                 RichEditor::make('content')
                     ->default(null)
                     ->columnSpanFull(),
                 Select::make('category_id')
-                    ->relationship(name: 'category', titleAttribute: 'name'),
+                    ->relationship(name: 'category', titleAttribute: 'arabic_name'),
                 Select::make('source_id')
                     ->relationship(name: 'sources', titleAttribute: 'arabic_name')
                     ->label('Source'),
