@@ -23,6 +23,7 @@ return [
     'categoryname' => 'Category.name',
     'code' => 'Code',
     'color' => 'Color',
+    'contact' => 'Contact',
     'contact_email' => 'Contact Email',
     'contact_message' => 'Contact Message',
     'contact_name' => 'Contact Name',

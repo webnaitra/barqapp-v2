@@ -14,10 +14,9 @@ class Adsense extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'code', 'location_id', 'category_id', 'type', 'is_mobile'
+        'name', 'code', 'location_id', 'category_id', 'type', 'is_mobile','type'
     ];
 
-    protected $appends = ['area_name'];
 
     /**
      * The relations to eager load on every query.

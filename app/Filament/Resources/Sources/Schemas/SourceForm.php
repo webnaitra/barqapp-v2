@@ -34,7 +34,7 @@ Tabs::make('Tabs')->label(__('filament.tabs'))
                     ->default(null)
                     ->columnSpanFull(),
                 Select::make('country_id')->label(__('filament.country_id'))
-                    ->relationship('country', 'name')
+                    ->relationship('country', 'arabic_name')
                     ->searchable()
                     ->preload()
                     ->label(__('filament.country')),
@@ -76,7 +76,7 @@ Tabs::make('Tabs')->label(__('filament.tabs'))
                 ->schema([
                     TextInput::make('source_url')->label(__('filament.source_url'))->default(null)->required(),
                     Select::make('category_id')->label(__('filament.category_id'))
-                        ->relationship('category', 'name')
+                        ->relationship('category', 'arabic_name')
                         ->searchable()
                         ->preload()
                         ->label(__('filament.category')),

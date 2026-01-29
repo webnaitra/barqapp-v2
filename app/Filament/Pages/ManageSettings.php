@@ -44,8 +44,10 @@ class ManageSettings extends SettingsPage
                         Tab::make('general')
                             ->label(__('filament.general_settings'))
                             ->schema([
-                                FileUpload::make('app_logo')->label(__('filament.app_logo'))->image()->columnSpanFull(),
-                                FileUpload::make('footer_logo')->label(__('filament.footer_logo'))->image()->columnSpanFull(),
+                                FileUpload::make('app_logo')->label(__('filament.app_logo'))->image()->directory('public/files')
+                                ->visibility('public')->columnSpanFull(),
+                                FileUpload::make('footer_logo')->label(__('filament.footer_logo'))->image()->directory('public/files')
+                                ->visibility('public')->columnSpanFull(),
                                 Textarea::make('footer_text')->label(__('filament.footer_text'))->columnSpanFull(),
                                 TextInput::make('app_header')->label(__('filament.app_header'))->columnSpanFull(),
                                 Textarea::make('app_download_text')->label(__('filament.download_text'))->columnSpanFull(),
@@ -88,11 +90,14 @@ class ManageSettings extends SettingsPage
                         Tab::make('ads_banners')
                             ->label(__('filament.ads_banners'))
                             ->schema([
-                                FileUpload::make('banner_1')->label(__('filament.banner').' 1')->image()->columnSpanFull(),
+                                FileUpload::make('banner_1')->label(__('filament.banner').' 1')->image()->directory('public/files')
+                    ->visibility('public')->columnSpanFull(),
                                 TextInput::make('banner_1_link')->label(__('filament.banner_link').' 1')->url()->columnSpanFull(),
-                                FileUpload::make('banner_2')->label(__('filament.banner').' 2')->image()->columnSpanFull(),
+                                FileUpload::make('banner_2')->label(__('filament.banner').' 2')->image()->directory('public/files')
+                    ->visibility('public')->columnSpanFull(),
                                 TextInput::make('banner_2_link')->label(__('filament.banner_link').' 2')->url()->columnSpanFull(),
-                                FileUpload::make('banner_3')->label(__('filament.banner').' 3')->image()->columnSpanFull(),
+                                FileUpload::make('banner_3')->label(__('filament.banner').' 3')->image()->directory('public/files')
+                    ->visibility('public')->columnSpanFull(),
                                 TextInput::make('banner_3_link')->label(__('filament.banner_link').' 3')->url()->columnSpanFull(),
                             ])
                             ->icon(Heroicon::OutlinedTv),

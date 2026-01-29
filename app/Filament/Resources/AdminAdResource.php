@@ -54,12 +54,14 @@ class AdminAdResource extends Resource
             ->components([
                 TextInput::make('name')->label(__('filament.name'))
                     ->maxLength(255)
-                    ->default(null)->columnSpan(2),
+                    ->default(null)->columnSpan(2)
+                    ->required(),
                 FileUpload::make('image')->label(__('filament.image'))
                     ->image()
                     ->directory('public/files')
                     ->visibility('public')
-                    ->default(null),
+                    ->default(null)
+                    ->required(),
                  FileUpload::make('source_icon')->label(__('filament.source_icon'))
                     ->image()
                     ->directory('public/files')
@@ -79,24 +81,29 @@ class AdminAdResource extends Resource
                     ->default(0),
                 TextInput::make('url')->label(__('filament.url'))
                     ->maxLength(255)
-                    ->default(null),
+                    ->default(null)
+                    ->url()
+                    ->required(),
                 TextInput::make('help_text')->label(__('filament.help_text'))
                     ->maxLength(255)
-                    ->default(null),
+                    ->default(null)
+                    ->required(),
                 Select::make('type')->label(__('filament.type'))
                     ->options([
                         'full' => 'Full',
                         'column' => 'Column',
                     ])
-                    ->default(null),
+                    ->default(null)
+                    ->required(),
                 Select::make('categories')->label(__('filament.categories'))
-                    ->relationship('categories', 'name')
+                    ->relationship('categories', 'arabic_name')
                     ->multiple()
                     ->preload(),
                 Select::make('locations')->label(__('filament.locations'))
                     ->relationship('locations', 'name')
                     ->multiple()
-                    ->preload(),
+                    ->preload()
+                    ->required(),
             ]);
     }
 
@@ -111,9 +118,9 @@ class AdminAdResource extends Resource
                         'full' => 'Full',
                         'column' => 'Column',
                     ]),
-                TextColumn::make('categories.name')->label(__('filament.categoriesname'))
+                TextColumn::make('categories.arabic_name')->label(__('filament.categories'))
                     ->sortable(),
-                TextColumn::make('locations.name')->label(__('filament.locationsname'))
+                TextColumn::make('locations.name')->label(__('filament.locations'))
                     ->sortable(),
                 TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()

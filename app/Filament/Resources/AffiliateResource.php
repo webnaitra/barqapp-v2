@@ -82,12 +82,12 @@ class AffiliateResource extends Resource
                     ->numeric() 
                     ->default(null),
                 Select::make('country_id')->label(__('filament.country_id'))
-                    ->relationship('country', 'name')
+                    ->relationship('country', 'arabic_name')
                     ->searchable()
                     ->preload()
                     ->label(__('filament.country')),
                 Select::make('categories')->label(__('filament.categories'))
-                    ->relationship('categories', 'name')
+                    ->relationship('categories', 'arabic_name')
                     ->multiple()
                     ->preload(),
             ]);

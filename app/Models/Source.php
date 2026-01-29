@@ -31,7 +31,11 @@ class Source extends Model
         'phone',
         'email',  
         'placeholder_image',
-        'logo'
+        'logo',
+        'filter_classes',
+        'content_classes',
+        'image_classes',
+        'freeze'
     ];
 
     public function getLogoUrlAttribute()

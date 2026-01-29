@@ -50,21 +50,31 @@ class AdsenseResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('adsense_name')->label(__('filament.adsense_name'))
+                TextInput::make('name')->label(__('filament.name'))
                     ->maxLength(255)
                     ->default(null)
-                    ->label(__('filament.name')),
-                CodeEditor::make('adsense_code')->label(__('filament.adsense_code'))
+                    ->label(__('filament.name'))
+                    ->required(),
+                CodeEditor::make('code')->label(__('filament.code'))
                     ->label(__('filament.code'))
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->required(),
                 Select::make('category_id')->label(__('filament.category_id'))
-                    ->relationship(name: 'category', titleAttribute: 'name')
+                    ->relationship(name: 'category', titleAttribute: 'arabic_name')
                     ->required(),
                 Select::make('location_id')->label(__('filament.location_id'))
-                    ->relationship(name: 'location', titleAttribute: 'name'),
+                    ->relationship(name: 'location', titleAttribute: 'name')
+                    ->required(),
                 Toggle::make('is_mobile')->label(__('filament.is_mobile'))
                     ->label(__('filament.for_mobile'))
                     ->default(false),
+                Select::make('type')->label(__('filament.type'))
+                    ->options([
+                        'full' => 'Full',
+                        'column' => 'Column',
+                    ])
+                    ->default('full')
+                    ->required(),
             ]);
     }
 
@@ -72,9 +82,11 @@ class AdsenseResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('adsense_name')->label(__('filament.adsense_name'))
+                TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('adsense_area')->label(__('filament.adsense_area'))
+                TextColumn::make('category.arabic_name')->label(__('filament.category'))
+                    ->searchable(),
+                TextColumn::make('location.name')->label(__('filament.location'))
                     ->searchable(),
                 TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()

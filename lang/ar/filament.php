@@ -23,6 +23,7 @@ return [
     'categoryname' => 'اسم القسم',
     'code' => 'الكود',
     'color' => 'اللون',
+    'contact' => 'التواصل',
     'contact_email' => 'بريد التواصل',
     'contact_message' => 'رسالة التواصل',
     'contact_name' => 'اسم جهة التواصل',

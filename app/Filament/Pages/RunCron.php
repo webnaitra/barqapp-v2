@@ -3,6 +3,13 @@
 namespace App\Filament\Pages;
 
 use Filament\Pages\Page;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Artisan;
+use App\Models\Category;
+use App\Models\Source;
 
 class RunCron extends Page
 {
@@ -52,59 +59,27 @@ class RunCron extends Page
     protected function getHeaderActions(): array
     {
         return [
-            \Filament\Actions\Action::make('emptyArticles')
-                ->label(__('filament.empty_articles'))
-                ->color('danger')
-                ->form([
-                    \Filament\Forms\Components\TextInput::make('olderThanDays')
-                        ->label(__('filament.older_than_days'))
-                        ->numeric()
-                        ->default(3)
-                        ->helperText(__('filament.older_than_days_helper')),
-                    \Filament\Forms\Components\Select::make('categoryId')
-                        ->label(__('filament.category'))
-                        ->options(\App\Models\Category::pluck('name', 'id'))
-                        ->placeholder('All Categories')
-                        ->searchable(),
-                    \Filament\Forms\Components\Select::make('sourceId')
-                        ->label(__('filament.source'))
-                        ->options(\App\Models\Source::pluck('name', 'id'))
-                        ->placeholder('All Sources')
-                        ->searchable(),
-                ])
-                ->action(function (array $data) {
-                    \Illuminate\Support\Facades\Artisan::call('cron:empty-articles', [
-                        'olderThanDays' => $data['olderThanDays'],
-                        'categoryId' => $data['categoryId'],
-                        'sourceId' => $data['sourceId'],
-                    ]);
-
-                    \Filament\Notifications\Notification::make()
-                        ->title(__('filament.success'))
-                        ->body(\Illuminate\Support\Facades\Artisan::output())
-                        ->success()
-                        ->send();
-                }),
-
-            \Filament\Actions\Action::make('fetchAllArticles')
+            Action::make('fetchAllArticles')
                 ->label(__('filament.fetch_all_articles'))
                 ->color('primary')
                 ->form([
-                    \Filament\Forms\Components\Select::make('categoryId')
+                    Select::make('categoryId')
                         ->label(__('filament.category'))
-                        ->options(\App\Models\Category::pluck('name', 'id'))
+                        ->options(Category::pluck('arabic_name', 'id'))
                         ->placeholder('All Categories')
                         ->searchable(),
-                    \Filament\Forms\Components\Select::make('sourceId')
+                    Select::make('sourceId')
                         ->label(__('filament.source'))
-                        ->options(\App\Models\Source::pluck('name', 'id'))
+                        ->options(Source::pluck('arabic_name', 'id'))
                         ->placeholder('All Sources')
                         ->searchable(),
                 ])
                 ->action(function (array $data) {
-                    $this->filters['categoryId'] = $data['categoryId'];
-                    $this->filters['sourceId'] = $data['sourceId'];
-                    $this->runFetch();
+                    return redirect(RunCron::getUrl())->with([
+                        'run_cron_action' => 'fetch',
+                        'run_cron_category_id' => $data['categoryId'],
+                        'run_cron_source_id' => $data['sourceId'],
+                    ]);
                 }),
         ];
     }

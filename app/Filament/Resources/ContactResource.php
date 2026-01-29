@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
@@ -48,14 +49,20 @@ class ContactResource extends Resource
             ->components([
                 TextInput::make('contact_name')->label(__('filament.contact_name'))
                     ->maxLength(255)
-                    ->default(null),
+                    ->default(null)
+                    ->columnSpan(2)
+                    ->required(),
                 TextInput::make('contact_email')->label(__('filament.contact_email'))
                     ->email()
                     ->maxLength(255)
-                    ->default(null),
-                TextInput::make('contact_message')->label(__('filament.contact_message'))
+                    ->columnSpan(2)
+                    ->default(null)
+                    ->required(),
+                Textarea::make('contact_message')->label(__('filament.contact_message'))
                     ->maxLength(255)
-                    ->default(null),
+                    ->default(null)
+                    ->columnSpan(2)
+                    ->required(),
             ]);
     }
 

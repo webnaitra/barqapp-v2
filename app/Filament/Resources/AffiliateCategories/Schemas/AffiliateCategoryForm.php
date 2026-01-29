@@ -27,15 +27,9 @@ class AffiliateCategoryForm
                     ->directory('public/files')
                     ->visibility('public')
                     ->default(null),
-                TextInput::make('icon_class')->label(__('filament.icon_class'))
-                    ->default(null),
                 TextInput::make('order')->label(__('filament.order'))
                     ->numeric()
-                    ->default(null),
-                Toggle::make('freeze')->label(__('filament.freeze'))
-                    ->required(),
-                Toggle::make('featured')->label(__('filament.featured'))
-                    ->required(),
+                    ->default(null)
             ]);
     }
 }

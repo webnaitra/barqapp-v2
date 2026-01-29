@@ -20,8 +20,8 @@ class SourceFeed extends Model
         'source_id',
         'source_url',
         'category_id',
-        'subcategory_id',
-        //'status_id',
+        'status_id',
+        'freeze'
     ];
 
     /**
