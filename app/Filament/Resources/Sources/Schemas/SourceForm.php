@@ -35,6 +35,7 @@ Tabs::make('Tabs')->label(__('filament.tabs'))
                     ->columnSpanFull(),
                 Select::make('countries')->label(__('filament.countries'))
                     ->relationship('countries', 'arabic_name')
+                    ->multiple()
                     ->searchable()
                     ->preload()
                     ->label(__('filament.countries')),
