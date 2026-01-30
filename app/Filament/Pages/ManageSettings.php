@@ -53,8 +53,6 @@ class ManageSettings extends SettingsPage
                                     'Yes' => __('filament.yes'),
                                     'No' => __('filament.no'),
                                 ])->columnSpanFull(),
-                                FileUpload::make('footer_logo')->label(__('filament.footer_logo'))->image()->directory('public/files')
-                                ->visibility('public')->columnSpanFull(),
                                 Textarea::make('footer_text')->label(__('filament.footer_text'))->columnSpanFull(),
                                 TextInput::make('app_header')->label(__('filament.app_header'))->columnSpanFull(),
                                 Textarea::make('app_download_text')->label(__('filament.download_text'))->columnSpanFull(),
