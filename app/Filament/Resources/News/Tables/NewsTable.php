@@ -25,9 +25,9 @@ class NewsTable
             ->columns([
                 TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('category.arabic_name')->label(__('filament.arabic_name'))
+                TextColumn::make('category.arabic_name')->label(__('filament.category'))
                     ->sortable(),
-                TextColumn::make('sources.arabic_name')->label(__('filament.arabic_name'))
+                TextColumn::make('sources.arabic_name')->label(__('filament.sources'))
                     ->sortable(),
                 TextColumn::make('date')->label(__('filament.date'))
                     ->searchable()

@@ -24,10 +24,10 @@ class SourceFeedsTable
                     ->searchable(),
                 TextColumn::make('source_url')->label(__('filament.source_url'))
                     ->searchable(),
-                TextColumn::make('source.arabic_name')->label(__('filament.arabic_name'))
+                TextColumn::make('source.arabic_name')->label(__('filament.source'))
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('category.arabic_name')->label(__('filament.arabic_name'))
+                TextColumn::make('category.arabic_name')->label(__('filament.category'))
                     ->numeric()
                     ->sortable(),
                 IconColumn::make('status_id')->label(__('filament.status_id'))->label(__('filament.valid_url'))

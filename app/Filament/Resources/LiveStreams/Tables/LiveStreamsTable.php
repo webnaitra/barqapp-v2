@@ -20,7 +20,7 @@ class LiveStreamsTable
             ->columns([
                 TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('countries.arabic_name')->label(__('filament.countriesarabic_name'))
+                TextColumn::make('countries.arabic_name')->label(__('filament.countries'))
                     ->label(__('filament.country'))
                     ->sortable(),
                 TextColumn::make('video')->label(__('filament.video'))

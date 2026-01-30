@@ -19,7 +19,7 @@ class AiWordsTable
             ->columns([
                 TextColumn::make('words')->label(__('filament.words'))
                     ->searchable(),
-                TextColumn::make('category.arabic_name')->label(__('filament.arabic_name'))
+                TextColumn::make('category.arabic_name')->label(__('filament.category'))
                     ->searchable(),
                 TextColumn::make('tags.tag_name')->label(__('filament.tags'))
                     ->searchable(),

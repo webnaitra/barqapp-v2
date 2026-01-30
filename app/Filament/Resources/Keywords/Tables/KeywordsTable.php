@@ -20,11 +20,11 @@ class KeywordsTable
             ->columns([
                 TextColumn::make('keyword_name')->label(__('filament.keyword_name'))
                     ->searchable(),
-                TextColumn::make('category.arabic_name')->label(__('filament.arabic_name'))
+                TextColumn::make('category.arabic_name')->label(__('filament.category'))
                     ->label(__('filament.category'))
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('countries.arabic_name')->label(__('filament.arabic_name'))
+                TextColumn::make('countries.arabic_name')->label(__('filament.countries'))
                     ->label(__('filament.countries'))
                     ->sortable()
                     ->searchable(),

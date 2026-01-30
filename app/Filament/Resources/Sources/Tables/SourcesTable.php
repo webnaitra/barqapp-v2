@@ -27,7 +27,7 @@ class SourcesTable
                     ->searchable(),
                 TextColumn::make('arabic_name')->label(__('filament.arabic_name'))
                     ->searchable(),
-                TextColumn::make('country.arabic_name')->label(__('filament.countryarabic_name'))
+                TextColumn::make('country.arabic_name')->label(__('filament.country'))
                     ->label(__('filament.country'))
                     ->sortable(),
                 ToggleColumn::make('freeze')->label(__('filament.freeze')),
