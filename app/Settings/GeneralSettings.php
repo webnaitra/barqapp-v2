@@ -7,8 +7,6 @@ use Spatie\LaravelSettings\Settings;
 class GeneralSettings extends Settings
 {
     // General
-    public ?string $app_logo;
-    public ?string $footer_logo;
     public ?string $footer_text;
     public ?string $app_header;
     public ?string $app_download_text;
@@ -16,6 +14,8 @@ class GeneralSettings extends Settings
     public ?string $newsletter_text;
     public ?string $app_google_play;
     public ?string $app_app_store;
+    public ?string $app_source_filter_enabled;
+    public ?string $app_category_filter_enabled;
 
     // Social
     public ?string $app_facebook;

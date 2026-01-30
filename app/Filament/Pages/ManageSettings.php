@@ -8,6 +8,7 @@ use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use App\Settings\GeneralSettings;
@@ -44,8 +45,14 @@ class ManageSettings extends SettingsPage
                         Tab::make('general')
                             ->label(__('filament.general_settings'))
                             ->schema([
-                                FileUpload::make('app_logo')->label(__('filament.app_logo'))->image()->directory('public/files')
-                                ->visibility('public')->columnSpanFull(),
+                                Select::make('app_source_filter_enabled')->label(__('filament.app_source_filter_enabled'))->options([
+                                    'Yes' => __('filament.yes'),
+                                    'No' => __('filament.no'),
+                                ])->columnSpanFull(),
+                                Select::make('app_category_filter_enabled')->label(__('filament.app_category_filter_enabled'))->options([
+                                    'Yes' => __('filament.yes'),
+                                    'No' => __('filament.no'),
+                                ])->columnSpanFull(),
                                 FileUpload::make('footer_logo')->label(__('filament.footer_logo'))->image()->directory('public/files')
                                 ->visibility('public')->columnSpanFull(),
                                 Textarea::make('footer_text')->label(__('filament.footer_text'))->columnSpanFull(),

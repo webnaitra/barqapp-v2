@@ -6,7 +6,9 @@ return new class extends SettingsMigration
 {
     public function up(): void
     {
-        $this->migrator->add('general.app_logo', '');
+
+        $this->migrator->add('general.app_source_filter_enabled', 'No');
+        $this->migrator->add('general.app_category_filter_enabled', 'No');
         $this->migrator->add('general.footer_logo', '');
         $this->migrator->add('general.footer_text', '');
         $this->migrator->add('general.app_header', '');
