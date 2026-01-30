@@ -33,11 +33,11 @@ Tabs::make('Tabs')->label(__('filament.tabs'))
                 Textarea::make('description')->label(__('filament.description'))
                     ->default(null)
                     ->columnSpanFull(),
-                Select::make('country_id')->label(__('filament.country_id'))
-                    ->relationship('country', 'arabic_name')
+                Select::make('countries')->label(__('filament.countries'))
+                    ->relationship('countries', 'arabic_name')
                     ->searchable()
                     ->preload()
-                    ->label(__('filament.country')),
+                    ->label(__('filament.countries')),
                 Toggle::make('freeze')->label(__('filament.freeze'))
                     ->required(),
                 TextInput::make('phone')->label(__('filament.phone'))

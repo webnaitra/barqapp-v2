@@ -70,11 +70,6 @@ class Source extends Model
         return $this->hasMany(News::class, 'source_id', 'id');
      }
 
-    public function country()
-    {
-        return $this->belongsTo(Country::class, 'country_id', 'id');
-    }
-
     public function countries()
     {
         return $this->belongsToMany(Country::class, 'country_source','source_id','country_id');

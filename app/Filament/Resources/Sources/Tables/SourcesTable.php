@@ -27,8 +27,8 @@ class SourcesTable
                     ->searchable(),
                 TextColumn::make('arabic_name')->label(__('filament.arabic_name'))
                     ->searchable(),
-                TextColumn::make('country.arabic_name')->label(__('filament.country'))
-                    ->label(__('filament.country'))
+                TextColumn::make('countries.arabic_name')->label(__('filament.countries'))
+                    ->label(__('filament.countries'))
                     ->sortable(),
                 ToggleColumn::make('freeze')->label(__('filament.freeze')),
                 TextColumn::make('phone')->label(__('filament.phone'))
@@ -55,8 +55,8 @@ class SourcesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('country')->label(__('filament.country'))
-                    ->relationship('country', 'arabic_name')
+                SelectFilter::make('countries')->label(__('filament.countries'))
+                    ->relationship('countries', 'arabic_name')
                     ->searchable()
                     ->multiple()
                     ->preload(),
