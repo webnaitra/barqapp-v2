@@ -15,6 +15,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use ArPHP\I18N\Arabic;
+use App\Settings\GeneralSettings;
 
 use App\Models\{
     Interest,
@@ -25,7 +26,7 @@ use App\Models\{
     Adsense,
     Advertiser,
     Page,
-    Notification_setting,
+
     Contact,
     Keyword,
     Whatsapp,
@@ -35,7 +36,6 @@ use App\Models\{
     AdsArea,
     LiveStream,
     ProductCategory,
-    Product,
     Country,
     Affiliate,
     AdminAd,
@@ -63,19 +63,19 @@ class WebApiController extends Controller
 
 
 
-    public function getServer()
+    public function getServer(GeneralSettings $settings)
     {
 
         $page = request()->input('page', '');
-        $categories = Category::select("id as category_id", 'name', 'order', 'slug', 'color')
+        $categories = Category::select("id", 'name', 'order', 'slug', 'color')
             ->orderBy("order", 'asc');
         $categories = $categories->get();
-        $categories = $this->removeMeta($categories->toArray());
+        $categories = $categories->toArray();
         $countries = Country::get();
 
 
         $userId = request()->header('X-User-ID');
-        $country = request()->input('country', 'مصر');
+        $country = request()->input('country', 'EG');
         // dd($requestedCountry);
         $user = null;
         if ($userId) {
@@ -101,39 +101,25 @@ class WebApiController extends Controller
 
 
         // Get footer menus
-        $menus = Menu::select("id as menu_id", 'menu_name', 'menu_parent_slug', 'menu_location', 'menu_content')
+        $menus = Menu::select("id", 'name')
             ->orderBy("id", 'asc')->get();
 
         foreach ($menus as $menu) {
-            $menu->menu_list = unserialize($menu->menu_content);
-            $list = array();
-            for ($i = 0; $i < count($menu->menu_list['names']); $i++) {
-                $munuSingle = new \stdClass;
-                $munuSingle->name = $menu->menu_list['names'][$i];
-                $munuSingle->link = $menu->menu_list['links'][$i];
-                $list[] = $munuSingle;
-            }
-            $menu->menu_list = $list;
+            $menu->menu_items = $menu->menuItems()->select('id', 'name', 'type', 'url', 'target')->orderBy('order', 'asc')->get();
         }
 
-
-        $this->table_prefix = "menu_";
-        $this->meta_fields[] = "menu_content";
-        $menus = $this->removeMeta($menus->toArray());
-
-        // get social links
-
-        $facebook = getOptionValue('app_facebook') ?? "";
-        $twitter = getOptionValue('app_twitter') ?? "";
-        $whatsapp = getOptionValue('app_whatsapp') ?? "";
-        $massenger = getOptionValue('app_massenger') ?? "";
-        $instagram = getOptionValue('app_instagram') ?? "";
-        $youtube = getOptionValue('app_youtube') ?? "";
-        $tiktok = getOptionValue('app_tiktok') ?? "";
-
-        $ads = Adsense::with(['area' => function ($query) {
+        $ads = Adsense::with(['location' => function ($query) {
             $query->select('name');
-        }])->select("id", 'adsense_name', 'adsense_code', 'adsense_area')->get();
+        }])->select("id", 'name', 'code')->get();
+
+        
+        $facebook = $settings->app_facebook ?? "";
+        $twitter = $settings->app_twitter ?? "";
+        $whatsapp = $settings->app_whatsapp ?? "";
+        $massenger = $settings->app_massenger ?? "";
+        $instagram = $settings->app_instagram ?? "";
+        $youtube = $settings->app_youtube ?? "";
+        $tiktok = $settings->app_tiktok ?? "";
 
         $social_links = [
             'facebook' => $facebook,
@@ -151,15 +137,8 @@ class WebApiController extends Controller
 
         // get static arrays
 
+
         $static_array = array(
-            'app_facebook',
-            'app_twitter',
-            'app_whatsapp',
-            'app_massenger',
-            'app_instagram',
-            'app_youtube',
-            'app_tiktok',
-            'footer_logo',
             'footer_text',
             'newsletter_text',
             'app_google_play',
@@ -173,16 +152,16 @@ class WebApiController extends Controller
 
         if($page == 'contact'){
 
-            $contact_title = getOptionValue('contact_title') ?? "";
-            $contact_introduction = getOptionValue('contact_introduction') ?? "";
-            $contact_form_title = getOptionValue('contact_form_title') ?? "";
-            $contact_form_introduction = getOptionValue('contact_form_introduction') ?? "";
-            $contact_address_title = getOptionValue('contact_address_title') ?? "";
-            $contact_address_content = getOptionValue('contact_address_content') ?? "";
-            $contact_email_title = getOptionValue('contact_email_title') ?? "";
-            $contact_email_content = getOptionValue('contact_email_content') ?? "";
-            $contact_phone_title = getOptionValue('contact_phone_title') ?? "";
-            $contact_phone_content = getOptionValue('contact_phone_content') ?? "";
+            $contact_title = $settings->contact_title ?? "";
+            $contact_introduction = $settings->contact_introduction ?? "";
+            $contact_form_title = $settings->contact_form_title ?? "";
+            $contact_form_introduction = $settings->contact_form_introduction ?? "";
+            $contact_address_title = $settings->contact_address_title ?? "";
+            $contact_address_content = $settings->contact_address_content ?? "";
+            $contact_email_title = $settings->contact_email_title ?? "";
+            $contact_email_content = $settings->contact_email_content ?? "";
+            $contact_phone_title = $settings->contact_phone_title ?? "";
+            $contact_phone_content = $settings->contact_phone_content ?? "";
             $static_array[] = 'contact_title';
             $static_array[] = 'contact_introduction';
             $static_array[] = 'contact_form_title';
@@ -197,12 +176,8 @@ class WebApiController extends Controller
 
         }
         $obj = array();
-        foreach ($static_array as $key) {
-            $value = getOptionValue($key);
-            if ($key == 'footer_logo' || $key == 'app_logo')
-                $obj[$key] = _img($value);
-            else
-                $obj[$key] = $value;
+        foreach ($static_array as $field) {
+            $obj[$field] = $settings->$field ?? "";
         }
 
         $final_array = array_merge($obj, array(
@@ -816,6 +791,7 @@ class WebApiController extends Controller
      * @param int $limit - Maximum number of results to return
      * @return Collection
      */
+    /*
     private function searchByKeywordCount($keywords, $minMatches, $excludeId, $limit)
     {
         $results = News::with(['category'])
@@ -876,6 +852,7 @@ class WebApiController extends Controller
         
         return $results;
     }
+    */
 
     public function getSingleNewsPage()
     {
@@ -1201,86 +1178,7 @@ class WebApiController extends Controller
         return response($response);
     }
 
-    private function removeMeta($objects, $single = false)
-    {
-        if ($single) {
-            $myObject = $objects;
-            $objects = array();
-            $objects[] = $myObject;
-        }
-        $newObjects = array();
-        foreach ($objects as $object) {
-            foreach ($object as $key => $value) {
-                if (in_array($key, $this->meta_fields)) {
-                    unset($object[$key]);
-                }
-                $cityId = $this->table_prefix . "city_id";
-                $catId = $this->table_prefix . "category_id";
-                $subCatId = $this->table_prefix . "sub_category_id";
-                $otherImages = $this->table_prefix . "other_images";
-                if ($key == $cityId) {
-                    if (!empty($value)) {
-                        $object['city_name'] = ($this->app_lang == "ar") ? getCities($value, 'city_name') : getCities($value, 'city_name_en');
-                    } else {
-                        $object['city_name'] = "";
-                    }
-                }
-                if ($key == 'created_at') {
-                    if (!empty($value)) {
-                        $object['created_at'] = date('d/m/Y', strtotime($value));
-                    } else {
-                        $object['created_at'] = "";
-                    }
-                }
-                if ($key == $catId) {
-                    if (!empty($value)) {
-                        $object[$this->table_prefix . 'name'] = ($this->app_lang == "ar") ? getCategories($value, 'name') : getCategories($value, 'name_en');
-                    } else {
-                        $object[$this->table_prefix . 'name'] = "";
-                    }
-                }
-                if ($key == $subCatId) {
-                    if (!empty($value)) {
-                        $object[$this->table_prefix . 'sub_name'] = ($this->app_lang == "ar") ? getCategories($value, 'name') : getCategories($value, 'name_en');
-                    } else {
-                        $object[$this->table_prefix . 'sub_name'] = "";
-                    }
-                }
-                if ($key == "image") {
-                    if (!empty($value)) {
-                        $object['imageUrl'] = _img($value);
-                    } else {
-                        $object['imageUrl'] = "";
-                    }
-                }
-                if ($key == "image_v") {
-                    if (!empty($value)) {
-                        $object['imageUrlHorizontal'] = _img($value);
-                    } else {
-                        $object['imageUrlHorizontal'] = "";
-                    }
-                }
-                if ($key == $otherImages) {
-                    $images = unserialize($value);
-                    if (!empty($images)) {
-                        $imagesArray = array();
-                        foreach ($images as $image) {
-                            if (!empty($image)) {
-                                $imagesArray[] = _img($image);
-                            }
-                        }
-                        $object['images'] = $imagesArray;
-                    } else {
-                        $object['images'] = array();
-                        $object['images'][] = asset('/images/Bitmap@4x.png');
-                    }
-                }
-            }
-            $object = $this->checkDataTypes($object);
-            $newObjects[] = $object;
-        }
-        return ($single) ? $newObjects[0] : $newObjects;
-    }
+
 
     private function checkDataTypes($object)
     {
@@ -1309,7 +1207,6 @@ class WebApiController extends Controller
     {
         $slug = $request->slug;
         $terms = Page::where('page_slug', $slug)->firstOrFail();
-        $terms->imageUrl = _img($terms->image);
         return $this->returnResponse(200, 'success', $terms, 'found');
     }
 
@@ -1449,6 +1346,7 @@ class WebApiController extends Controller
         return $this->returnResponse(200, 'success', 1, 'تم تعديل كلمة المرور بنجاح');
     }
 
+    /*
     public function getUserData(Request $request)
     {
         $advertiser = Advertiser::find($request->userId);
@@ -1459,73 +1357,75 @@ class WebApiController extends Controller
         $message = ($this->app_lang == "ar") ? "المستخدم غير موجود" : "User does not exist";
         return $this->returnResponse(403, 'failure', 0, $message);
     }
+    */
 
-    public function getCategoriesWithNews()
-    {
-        $categories = Category::select("id as category_id", 'name', 'order')->orderBy("order", 'asc');
-        $categories = $categories->get();
-        $cats = array();
-        foreach ($categories as $category) {
-            $cat = $this->getCategoryNews($category);
-            if (!empty($cat['news'])) $cats[] = $cat;
-        }
-        // $this->table_prefix = "";
-        // $categories = $this->removeMeta($categories->toArray());
-        return $cats;
-    }
+    // public function getCategoriesWithNews()
+    // {
+    //     $categories = Category::select("id as category_id", 'name', 'order')->orderBy("order", 'asc');
+    //     $categories = $categories->get();
+    //     $cats = array();
+    //     foreach ($categories as $category) {
+    //         $cat = $this->getCategoryNews($category);
+    //         if (!empty($cat['news'])) $cats[] = $cat;
+    //     }
+    //     // $this->table_prefix = "";
+    //     // $categories = $this->removeMeta($categories->toArray());
+    //     return $cats;
+    // }
 
-    public function getCategoryNews($category)
-    {
-        $news = News::select(
-            "id",
-            'name',
-            'image',
-            'category_id',
-            'urgent',
-            'video',
-            'source_id',
-            'source_link',
-            'created_at'
-        )->where('category_id', $category->category_id)->limit(3)->get();
-        foreach ($news as $newsItem) {
-            $newsItem->news_video = (!empty($newsItem->news_video)) ? 'https://www.youtube.com/embed/' . getYoutubeId($newsItem->news_video) : '';
-            if (!empty($fav_user)) {
-                $oldFavorite = Favorite::where('fav_news_id', $newsItem->id)
-                    ->where('fav_user_id', $fav_user)->first();
-                if (!empty($oldFavorite)) {
-                    $newsItem->is_favorite = 1;
-                } else {
-                    $newsItem->is_favorite = 0;
-                }
-            } else {
-                $newsItem->is_favorite = 0;
-                $fav_user = '';
-            }
-            $newsItem->relatedNews = $this->getRelatedNews($newsItem, $fav_user);
-            $newsItem->newsKeywords = getNewsKeywordsWithName($newsItem->id);
-        }
-        $this->table_prefix = "news_";
-        $news = $this->removeMeta($news->toArray());
-        $cat = array();
-        $cat['name'] = $category->name;
-        $cat['news'] = $news;
-        return $cat;
-    }
+    // public function getCategoryNews($category)
+    // {
+    //     $news = News::select(
+    //         "id",
+    //         'name',
+    //         'image',
+    //         'category_id',
+    //         'urgent',
+    //         'video',
+    //         'source_id',
+    //         'source_link',
+    //         'created_at'
+    //     )->where('category_id', $category->category_id)->limit(3)->get();
+    //     foreach ($news as $newsItem) {
+    //         $newsItem->news_video = (!empty($newsItem->news_video)) ? 'https://www.youtube.com/embed/' . getYoutubeId($newsItem->news_video) : '';
+    //         if (!empty($fav_user)) {
+    //             $oldFavorite = Favorite::where('fav_news_id', $newsItem->id)
+    //                 ->where('fav_user_id', $fav_user)->first();
+    //             if (!empty($oldFavorite)) {
+    //                 $newsItem->is_favorite = 1;
+    //             } else {
+    //                 $newsItem->is_favorite = 0;
+    //             }
+    //         } else {
+    //             $newsItem->is_favorite = 0;
+    //             $fav_user = '';
+    //         }
+    //         $newsItem->relatedNews = $this->getRelatedNews($newsItem, $fav_user);
+    //         $newsItem->newsKeywords = getNewsKeywordsWithName($newsItem->id);
+    //     }
+    //     $this->table_prefix = "news_";
+    //     $news = $this->removeMeta($news->toArray());
+    //     $cat = array();
+    //     $cat['name'] = $category->name;
+    //     $cat['news'] = $news;
+    //     return $cat;
+    // }
 
 
-    public function getAdsense(Request $request)
-    {
-        $area = $request->area;
-        $adsense = Adsense::select("id", 'adsense_name', 'adsense_code', 'adsense_area');
-        if (isset($area)) {
-            $adsense = $adsense->where('adsense_area', $area);
-        }
-        $adsense = $adsense->get();
-        $this->table_prefix = "adsense_";
-        $adsense = $this->removeMeta($adsense->toArray());
-        return $this->returnResponse(200, 'success', $adsense, 'found');
-    }
+    // public function getAdsense(Request $request)
+    // {
+    //     $area = $request->area;
+    //     $adsense = Adsense::select("id", 'adsense_name', 'adsense_code', 'adsense_area');
+    //     if (isset($area)) {
+    //         $adsense = $adsense->where('adsense_area', $area);
+    //     }
+    //     $adsense = $adsense->get();
+    //     $this->table_prefix = "adsense_";
+    //     $adsense = $this->removeMeta($adsense->toArray());
+    //     return $this->returnResponse(200, 'success', $adsense, 'found');
+    // }
 
+    /*
     public function getAllNews(Request $request) {}
 
     public function getNews(Request $request, $userId)
@@ -1578,9 +1478,6 @@ class WebApiController extends Controller
                         ->where('name', 'LIKE', '%' . $keyword . '%')
                         ->distinct('id')->pluck('id')->toArray();
                 });
-        }
-        if (isset($subCat)) {
-            $news = $news->where($subCat);
         }
         if (isset($source)) {
             $news = $news->where('source', $source);
@@ -1746,6 +1643,7 @@ class WebApiController extends Controller
         $response = array("status" => 200, "sub_message" => 'success', "return" => $news, 'categories' => $categoriesNews, "message" => 'found');
         return response($response);
     }
+    */
 
     public function getRelatedNews($newsItem, $fav_user = '')
     {
@@ -1779,6 +1677,7 @@ class WebApiController extends Controller
         return $news;
     }
 
+    /*
     public function getFooterMenu()
     {
         $menus = Menu::select("id as menu_id", 'menu_name', 'menu_parent_slug', 'menu_content')
@@ -1842,31 +1741,6 @@ class WebApiController extends Controller
         return $this->get_option_value('app_about');
     }
 
-    public function getSettings()
-    {
-        $array = array(
-            'app_facebook',
-            'app_twitter',
-            'app_whatsapp',
-            'app_massenger',
-            'footer_logo',
-            'footer_text',
-            'newsletter_text',
-            'app_google_play',
-            'app_app_store',
-            'copyright',
-            'app_logo'
-        );
-        $obj = new \stdClass;
-        foreach ($array as $key) {
-            $value = getOptionValue($key);
-            if ($key == 'footer_logo')
-                $obj->$key = _img($value);
-            else
-                $obj->$key = $value;
-        }
-        return $this->returnResponse(200, 'success', $obj, 'found');
-    }
 
     public function appIntroduction()
     {
@@ -1962,6 +1836,7 @@ class WebApiController extends Controller
         }
         return $this->returnResponse(200, 'success', 1, $message);
     }
+    */
 
 
 
@@ -2069,6 +1944,7 @@ class WebApiController extends Controller
         return $this->returnResponse(200, 'success', $user->push_notifications_enabled, $message);
     }
 
+    /*
     public function updateNotificationSettings()
     {
         $userId = (!empty($_POST['userId'])) ? $_POST['userId'] : '';
@@ -2196,6 +2072,7 @@ class WebApiController extends Controller
             ->count();
         return $this->returnResponse(200, 'success', $notifications, 'found');
     }
+    */
 
 
 
@@ -2230,6 +2107,7 @@ class WebApiController extends Controller
     }
 
 
+    /*
     public function updateProfile(Request $request)
     {
         $userId = (!empty($_POST['userId'])) ? $_POST['userId'] : '';
@@ -2285,6 +2163,7 @@ class WebApiController extends Controller
 
         return $this->returnResponse(200, 'success', $array, $message);
     }
+    */
 
 public function getUserFavorites()
 {
@@ -2336,6 +2215,7 @@ public function getUserFavorites()
 }
 
 
+    /*
     public function changeLang()
     {
         $lang = (!empty($_POST['lang'])) ? $_POST['lang'] : "";
@@ -2368,6 +2248,7 @@ public function getUserFavorites()
             'massenger' => $massenger,
         ];
     }
+    */
 
     public function getAllCountries()
     {

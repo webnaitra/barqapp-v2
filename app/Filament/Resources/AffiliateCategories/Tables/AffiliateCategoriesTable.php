@@ -24,8 +24,6 @@ class AffiliateCategoriesTable
                     ->searchable(),
                 TextColumn::make('slug')->label(__('filament.slug'))
                     ->searchable(),
-                ToggleColumn::make('freeze')->label(__('filament.freeze')),
-                ToggleColumn::make('featured')->label(__('filament.featured')),
                 TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
@@ -40,8 +38,8 @@ class AffiliateCategoriesTable
                 //
             ])
             ->recordActions([
-                EditAction::make()->button()->outlined(),
-                DeleteAction::make()->button(),
+                EditAction::make()->button()->color('zinc'),
+                DeleteAction::make()->button()->color('danger'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

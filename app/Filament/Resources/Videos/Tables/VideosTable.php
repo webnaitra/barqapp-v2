@@ -26,7 +26,7 @@ class VideosTable
                 TextColumn::make('sources.arabic_name')->label(__('filament.sourcesarabic_name'))
                     ->searchable()
                     ->label(__('filament.source')),
-                TextColumn::make('category.name')->label(__('filament.categoryname'))
+                TextColumn::make('category.arabic_name')->label(__('filament.categoryname'))
                     ->sortable()
                     ->label(__('filament.category')),
                 TextColumn::make('countries.arabic_name')->label(__('filament.countriesarabic_name'))
@@ -53,7 +53,7 @@ class VideosTable
                 ->searchable()
                 ->preload(),
                 SelectFilter::make('category')->label(__('filament.category'))
-                ->relationship('category', 'name')
+                ->relationship('category', 'arabic_name')
                 ->searchable()
                 ->preload(),
                 SelectFilter::make('countries')->label(__('filament.countries'))
@@ -86,8 +86,8 @@ class VideosTable
             ], layout: FiltersLayout::AboveContent)
             ->filtersFormColumns(5)
             ->recordActions([
-                EditAction::make()->button()->outlined(),
-                DeleteAction::make()->button(),
+                EditAction::make()->button()->color('zinc'),
+                DeleteAction::make()->button()->color('danger'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

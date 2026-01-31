@@ -16,6 +16,8 @@ class Category extends Model
         'name','arabic_name','slug', 'color', 'order', 'image', 'order', 'icon_class', 'freeze', 'featured'
     ];
 
+    protected $appends = array('image_url');
+
 
 
     public function news()
@@ -38,15 +40,11 @@ class Category extends Model
             );
     }
 
-
-    public function getAllNewsAttribute() {
-        $news = $this->news;
-        $subnews = $this->subnews;
-    
-        return $news->merge($subnews);
+        public function getImageUrlAttribute()
+    {
+            $path = str_replace('public/', 'storage/', $this->image);
+            return asset($path);
     }
-
-
 
     public function users()
     {

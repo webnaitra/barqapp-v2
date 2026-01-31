@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Scopes\VideoFilterScope;
+use Illuminate\Support\Facades\Storage;
 
 class Video extends Model
 {
@@ -75,7 +76,11 @@ class Video extends Model
      */
     public function getSourceIconAttribute()
     {
-        return !empty($this->sources->logo) ? env('CRON_URL').'storage/'.$this->sources->logo : url('/images/barqapp_placeholder.jpg');
+        if($this->sources && $this->sources->logo){
+            $path = str_replace('public/', 'storage/', $this->sources->logo);
+            return asset($path);
+        }
+        return url('/images/barqapp_placeholder.jpg');
     }
 
      
@@ -87,7 +92,8 @@ class Video extends Model
     public function getImageUrlAttribute()
     {
         if (filter_var($this->image, FILTER_VALIDATE_URL) === FALSE) {
-            return url('storage/app').'/'.$this->image;
+            $path = str_replace('storage/public/', '', $this->image);
+            return asset('storage/' . $path);
         }
 
         if (strpos($this->image, 'skynewsarabia.com') !== false) {

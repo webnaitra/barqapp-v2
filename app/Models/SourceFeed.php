@@ -24,16 +24,6 @@ class SourceFeed extends Model
         'freeze'
     ];
 
-    /**
-     * Search query in multiple whereOr
-     */
-    public static function search($query)
-    {
-        return empty($query) ? static::query()
-            : static::where('name', 'like', '%'.$query.'%');
-
-    }
-
     public function source()
     {
         return $this->belongsTo(Source::class, 'source_id');
@@ -48,10 +38,5 @@ class SourceFeed extends Model
     {
         return $this->belongsTo(Country::class);
     }
-    
-
-    
-
-       
 
 }

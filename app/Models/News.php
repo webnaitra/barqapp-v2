@@ -15,7 +15,7 @@ class News extends Model
      */
 
     protected $table = 'news';
-    protected $appends = array('image_url', 'favorite', 'has_source_logo', 'source_icon', 'source');
+    protected $appends = array('image_url', 'favorite', 'source_icon', 'source');
     protected $fillable = [
         'name', 'content', 'image', 'category_id',
         'views', 'shares', 'urgent', 'video', 'site', 'source_link', 'slug','date','excerpt'
@@ -85,7 +85,11 @@ class News extends Model
      */
     public function getSourceIconAttribute()
     {
-        return !empty($this->sources->logo) ? env('CRON_URL').'storage/'.$this->sources->logo : url('/images/barqapp_placeholder.jpg');
+        if($this->sources && $this->sources->logo){
+            $path = str_replace('public/', 'storage/', $this->sources->logo);
+            return asset($path);
+        }
+        return url('/images/barqapp_placeholder.jpg');
     }
 
     public function getImageAttribute($value)
@@ -96,7 +100,7 @@ class News extends Model
         if(!$this->sources) {
             return url('/images/barqapp_placeholder_large.jpg');
         }
-        $source_image = $this->sources->placeholder_image ? env('CRON_URL').'storage/'.$this->sources->placeholder_image : url('/images/barqapp_placeholder_large.jpg');
+        $source_image = $this->sources->placeholder_image ? $this->sources->placeholder_image : url('/images/barqapp_placeholder_large.jpg');
         return  $source_image;
     }
 
@@ -119,7 +123,8 @@ class News extends Model
     public function getImageUrlAttribute()
     {
         if (filter_var($this->image, FILTER_VALIDATE_URL) === FALSE) {
-            return url('storage/app').'/'.$this->image;
+            $path = str_replace('public/', 'storage/', $this->image);
+            return asset($path);
         }
 
         if (strpos($this->image, 'skynewsarabia.com') !== false) {
@@ -136,15 +141,6 @@ class News extends Model
     {
         $value = html_entity_decode($value);
         return strip_tags($value);
-    }
-
-    public function getHasSourceLogoAttribute()
-    {
-         
-        if (str_contains($this->news_image, 'cronapp.jawlate.com')|| str_contains($this->news_image, 'cronapp.barqapp.net')) { 
-            return true;
-        }
-        return false;
     }
 
     public function getFavoriteAttribute()

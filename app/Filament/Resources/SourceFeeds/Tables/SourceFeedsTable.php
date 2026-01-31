@@ -62,9 +62,10 @@ class SourceFeedsTable
             ->recordActions([
                 Action::make('testFeed')
                     ->label(__('filament.test_feed'))
-                    ->icon('heroicon-o-play')
+                    ->icon('heroicon-s-play')
                     ->button()
                     ->outlined()
+                    ->color('zinc')
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel(__('filament.close'))
                     ->modalContent(function (\App\Models\SourceFeed $record) {
@@ -101,8 +102,8 @@ class SourceFeedsTable
                             'error' => $error,
                         ]);
                     }),
-                EditAction::make()->button()->outlined(),
-                DeleteAction::make()->button(),
+                EditAction::make()->button()->color('zinc'),
+                DeleteAction::make()->button()->color('danger'),
                 
             ])
             ->toolbarActions([

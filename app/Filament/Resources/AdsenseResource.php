@@ -101,8 +101,8 @@ class AdsenseResource extends Resource
                 //
             ])
             ->recordActions([
-                EditAction::make()->button()->outlined(),
-                DeleteAction::make()->button(),
+                EditAction::make()->button()->color('zinc'),
+                DeleteAction::make()->button()->color('danger'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

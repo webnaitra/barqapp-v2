@@ -40,14 +40,21 @@ class Source extends Model
 
     public function getLogoUrlAttribute()
     {
-        // Return the related media image or null if not available
-        return $this->logo ? env('CRON_URL').'storage/'.$this->logo : url('/images/barqapp_placeholder.jpg');
+        if($this->logo){
+            $path = str_replace('public/', 'storage/', $this->logo);
+            return asset($path);
+        }
+
+        return  url('/images/barqapp_placeholder.jpg');
     }
 
     public function getPlaceholderImageUrlAttribute()
     {
-        // Return the related media image or null if not available
-        return $this->placeholder_image ? env('CRON_URL').'storage/'.$this->placeholder_image : url('/images/barqapp_placeholder_large.jpg');
+        if($this->placeholder_image){
+            $path = str_replace('public/', 'storage/', $this->placeholder_image);
+            return asset($path);
+        }
+        return url('/images/barqapp_placeholder_large.jpg');
     }
 
     public function getFollowersAttribute()

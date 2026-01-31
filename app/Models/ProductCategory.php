@@ -11,6 +11,7 @@ class ProductCategory extends Model
 
     protected $table = 'product_categories';
     protected $hidden = ['created_at', 'updated_at'];
+    protected $appends = ['image_url'];
 
     public $timestamps = false;
 
@@ -24,5 +25,11 @@ class ProductCategory extends Model
     public function affiliates()
     {
         return $this->belongsToMany(Affiliate::class, 'affiliate_product_category', 'product_category_id', 'affiliate_id');
+    }
+
+    public function getImageUrlAttribute()
+    {
+            $path = str_replace('public/', 'storage/', $this->image);
+            return asset($path);
     }
 }

@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-// use Laravel\Passport\HasApiTokens;
+use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 // use NotificationChannels\WebPush\HasPushSubscriptions;
 
 class Advertiser extends Authenticatable
 {
     use Notifiable; // HasPushSubscriptions;
-    // use HasApiTokens;
+    use HasApiTokens;
 
     protected $table = 'advertisers';
     protected $hidden = ['adv_forgot_password_code', 'adv_reset_token', 'adv_password'];

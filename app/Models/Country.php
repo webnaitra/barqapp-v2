@@ -17,7 +17,7 @@ class Country extends Model
 
     public function liveStreams()
     {
-        return $this->belongsToMany(Country::class, 'country_live_stream','country_id','live_stream_id');
+        return $this->belongsToMany(LiveStream::class, 'country_live_stream','country_id','live_stream_id');
     }
 
     public function sources()

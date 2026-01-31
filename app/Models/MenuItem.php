@@ -12,6 +12,7 @@ class MenuItem extends Model
      *
      * @var array
      */
+    protected $hidden = ['id', 'created_at', 'updated_at'];
     protected $fillable = [
         'name', 'type', 'url', 'target'
     ];

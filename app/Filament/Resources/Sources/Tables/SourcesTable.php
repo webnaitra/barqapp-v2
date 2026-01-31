@@ -64,7 +64,7 @@ class SourcesTable
             ->recordActions([
                 Action::make('emptyArticles')
                     ->label(__('filament.empty'))
-                    ->icon('heroicon-o-folder-open')
+                    ->icon('heroicon-s-folder-open')
                     ->color('danger')
                     ->requiresConfirmation()
                     ->action(function ($record) {
@@ -75,18 +75,20 @@ class SourcesTable
                             ->send();
                     })
                     ->button()
-                    ->outlined(),
+                    ->outlined()
+                    ->color('zinc'),
                 Action::make('fetchArticles')
                     ->label(__('filament.fetch'))
-                    ->icon('heroicon-o-folder-arrow-down')
+                    ->icon('heroicon-s-folder-arrow-down')
                     ->action(fn ($record) => redirect(RunCron::getUrl())->with([
                         'run_cron_action' => 'fetch',
                         'run_cron_source_id' => $record->id,
                     ]))
                     ->button()
-                    ->outlined(),
-                EditAction::make()->button()->outlined(),
-                DeleteAction::make()->button(),
+                    ->outlined()
+                    ->color('zinc'),
+                EditAction::make()->button()->color('zinc'),
+                DeleteAction::make()->button()->color('danger'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

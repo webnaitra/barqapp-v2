@@ -30,18 +30,8 @@ class Affiliate extends Model
 
     public function getImageUrlAttribute()
     {
-        if (filter_var($this->image, FILTER_VALIDATE_URL) === FALSE) {
-            return url('storage/app').'/'.$this->image;
-        }
-
-        if (strpos($this->image, 'skynewsarabia.com') !== false) {
-            $needle = "/95/53";
-            $replacement = "/900/506";
-            $url = str_replace($needle, $replacement, $this->image);
-        } else {
-            $url = $this->image;
-        }
-        return $url;
+            $path = str_replace('public/', 'storage/', $this->image);
+            return asset($path);
     }
 
     public function productCategories()

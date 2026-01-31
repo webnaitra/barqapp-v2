@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class AdminAd extends Model
 {
     use HasFactory;
+    protected $appends = ['image_url'];
 
     protected $guarded = [];
 
@@ -19,6 +20,12 @@ class AdminAd extends Model
     public function locations()
     {
         return $this->belongsToMany(Location::class, 'admin_ad_location', 'admin_ad_id', 'location_id');
+    }
+
+    public function getImageUrlAttribute()
+    {
+            $path = str_replace('public/', 'storage/', $this->image);
+            return asset($path);
     }
     
 

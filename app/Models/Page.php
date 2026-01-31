@@ -12,20 +12,15 @@ class Page extends Model
      *
      * @var array
      */
+    protected $appends = array('image_url');
     protected $fillable = [
         'page_name', 'page_content', 'image', 'page_slug'
     ];
 
-    /**
-     * The relations to eager load on every query.
-     *
-     * @var array
-     */
-
-    /**
-     * Get the list of tags attached to the article.
-     *
-     * @return array
-     */
+        public function getImageUrlAttribute()
+    {
+            $path = str_replace('public/', 'storage/', $this->image);
+            return asset($path);
+    }
 
 }

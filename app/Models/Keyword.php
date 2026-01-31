@@ -18,7 +18,7 @@ class Keyword extends Model
      * @var array
      */
 
-    protected $appends = array('followers', 'subscribed');
+    protected $appends = array('image_url','followers', 'subscribed');
     protected $fillable = [
         'keyword_name', 'image', 'type' , 'short_description', 'description', 'category_id'
     ];
@@ -34,6 +34,12 @@ class Keyword extends Model
     public function users()
     {
         return $this->belongsToMany(Advertiser::class, 'user_keywords', 'keyword_id', 'user_id');
+    }
+
+    public function getImageUrlAttribute()
+    {
+            $path = str_replace('public/', 'storage/', $this->image);
+            return asset($path);
     }
 
     public function getFollowersAttribute()
