@@ -25,4 +25,9 @@ class Country extends Model
         return $this->belongsToMany(Source::class, 'country_source','country_id','source_id');
     }
 
+    public function news()
+    {
+        return $this->belongsToMany(News::class, 'country_news','country_id','news_id');
+    }
+
 }

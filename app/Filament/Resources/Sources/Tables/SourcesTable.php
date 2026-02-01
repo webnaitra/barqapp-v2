@@ -31,6 +31,11 @@ class SourcesTable
                     ->label(__('filament.countries'))
                     ->sortable(),
                 ToggleColumn::make('freeze')->label(__('filament.freeze')),
+                TextColumn::make('news_count')
+                ->counts('news')
+                ->badge()
+                ->label(__('filament.news_count'))
+                ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('phone')->label(__('filament.phone'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),

@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Illuminate\Support\Facades\Hash;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Tables\Columns\TextColumn;
@@ -63,14 +65,22 @@ class UserResource extends Resource
                 TextInput::make('nickname')->label(__('filament.nickname'))
                     ->maxLength(255)
                     ->default(null),
+                Select::make('roles')
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
                 FileUpload::make('image')->label(__('filament.image'))
                     ->image()
                     ->directory('public/files')
                     ->visibility('public')
                     ->default(null),
                 DateTimePicker::make('email_verified_at')->label(__('filament.email_verified_at')),
+                
                 TextInput::make('password')->label(__('filament.password'))
                     ->password()
+                    ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
+                    ->saved(fn (?string $state): bool => filled($state))
                     ->required()
                     ->maxLength(255),
             ]);
@@ -88,6 +98,9 @@ class UserResource extends Resource
                     ->searchable(),
                 TextColumn::make('nickname')->label(__('filament.nickname'))
                     ->searchable(),
+                TextColumn::make('roles.name')->label(__('filament.user_group'))
+                    ->searchable()
+                    ->badge(),
                 TextColumn::make('email_verified_at')->label(__('filament.email_verified_at'))
                     ->dateTime()
                     ->sortable(),

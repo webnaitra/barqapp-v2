@@ -97,8 +97,4 @@ class Source extends Model
         return $this->hasMany(SourceFeed::class,'source_id','id');
     }
 
-    public function social_links()
-    {
-        return $this->hasMany(SocialMedia::class, 'source_id', 'id');
-    }
 }

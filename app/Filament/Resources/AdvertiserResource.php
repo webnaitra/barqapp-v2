@@ -7,6 +7,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\DateTimePicker;
+use Illuminate\Support\Facades\Hash;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -76,6 +77,8 @@ class AdvertiserResource extends Resource
                     ->password()
                     ->maxLength(255)
                     ->label(__('filament.password'))
+                    ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
+                    ->saved(fn (?string $state): bool => filled($state))
                     ->default(null),
                 TextInput::make('adv_mobile')->label(__('filament.adv_mobile'))
                     ->maxLength(20)

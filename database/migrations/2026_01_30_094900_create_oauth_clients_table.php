@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('oauth_clients');
         Schema::create('oauth_clients', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->nullableMorphs('owner');

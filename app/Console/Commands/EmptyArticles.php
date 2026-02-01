@@ -61,13 +61,13 @@ class EmptyArticles extends Command
         ->whereDoesntHave('category', function ($q) {
             $q->where('freeze', 1);
         })
-        ->whereDoesntHave('source', function ($q) {
+        ->whereDoesntHave('sources', function ($q) {
             $q->where('freeze', 1);
         })
         ->whereDoesntHave('sourcefeed', function ($q) {
             $q->where('freeze', 1);
         })
-        ->where('freeze', 0)
+        ->where('urgent', 0)
         ->delete();
 
         return 0;

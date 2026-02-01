@@ -4,9 +4,11 @@ namespace App\Services;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Str;
+use App\Models\Source;
 use App\Models\SourceFeed;
 use App\Models\News;
 use App\Models\Tag;
+use App\Models\Country;
 use Illuminate\Support\Facades\Log;
 
 class FetchArticlesService
@@ -148,6 +150,10 @@ class FetchArticlesService
                         $post->created_at = $publishedAt ?? $date;
                         $post->updated_at = $date;
                         $post->save();
+                        $source = Source::find($source_id);
+                        if ($source) {
+                            $post->countries()->attach($source->countries->pluck('id'));
+                        }
 
                         // Tags
                         $tags = Tag::all();

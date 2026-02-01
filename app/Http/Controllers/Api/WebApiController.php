@@ -869,7 +869,13 @@ class WebApiController extends Controller
                 $news = News::with(['category'])->where('id', $news_id)->firstOrFail();
             }
 
-            $countryId = $news->sources->country_id;
+
+            if(request()->country){
+                $country = Country::where('country_code', request()->country)->first();
+                $countryId = $country->id;
+            }else{
+                $countryId = $news->sources->countries[0]->id;
+            }
 
             $keywords = $news->keywords;
             $previous_news_id = News::where('id', '<', $news->id)->whereHas('sources.countries', function ($q) use ($countryId) {
@@ -982,7 +988,9 @@ class WebApiController extends Controller
         $source = request()->source;
         $category = request()->category;
         $type = request()->type;
-        $ads = AdminAd::getAllAds();
+        $ads = AdminAd::whereHas('locations', function ($query) {
+            $query->where('name', 'Search');
+        })->get();
 
         $news = News::with(['category'])
             ->select(
@@ -1041,7 +1049,7 @@ class WebApiController extends Controller
         $news = $news->distinct('slug')->take(40)->paginate(40);
         $finalArray = [
             'news' => $news,
-            'single_ad' => $ads['single_ad'],
+            'ads' => $ads,
             'affiliates' => Affiliate::select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get(),
         ];
 
@@ -1162,7 +1170,7 @@ class WebApiController extends Controller
         // dd($categories);
 
         $this->table_prefix = "";
-        $categories = $this->removeMeta($categories->toArray());
+        $categories = $categories->toArray();
         return $this->returnResponse(200, 'success', $categories, 'found');
     }
 

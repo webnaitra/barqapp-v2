@@ -168,6 +168,8 @@ return [
     'tag' => 'Tag',
     'user' => 'User',
     'users' => 'Users',
+    'user_group' => 'User Group',
+    'news_count' => 'News Count',
     'videos' => 'Videos',
     'videos_management' => 'Videos Management',
     'affiliate_category' => 'Affiliate Category',

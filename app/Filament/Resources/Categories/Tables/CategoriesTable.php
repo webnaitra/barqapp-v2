@@ -30,6 +30,11 @@ class CategoriesTable
                     ->searchable(),
                 ToggleColumn::make('freeze')->label(__('filament.freeze')),
                 ToggleColumn::make('featured')->label(__('filament.featured')),
+                TextColumn::make('news_count')
+                ->counts('news')
+                ->badge()
+                ->label(__('filament.news_count'))
+                ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
@@ -51,7 +56,7 @@ class CategoriesTable
                     ->requiresConfirmation()
                     ->action(function ($record) {
                         Artisan::call('cron:empty-articles', ['categoryId' => $record->id, 'olderThanDays' => 3]);
-                        Notifcation::make()
+                        Notification::make()
                             ->title('Articles Emptied')
                             ->success()
                             ->send();

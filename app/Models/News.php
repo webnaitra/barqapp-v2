@@ -111,6 +111,18 @@ class News extends Model
         return $this->belongsToMany(Tag::class, 'news_tags', 'news_id', 'tag_id');
     }
 
+
+    /**
+     * Get all of the posts that are assigned this tag.
+     */
+    public function countries(){
+        return $this->belongsToMany(Country::class, 'country_news', 'news_id', 'country_id');
+    }
+
+    /** Belongs to Sourcefeed */
+    public function sourcefeed(){
+        return $this->belongsTo(SourceFeed::class, 'sourcefeed_id', 'id');
+    }
     /**
      * Get all of the posts that are assigned this keywords.
      */

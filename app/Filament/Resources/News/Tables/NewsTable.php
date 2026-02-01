@@ -32,6 +32,10 @@ class NewsTable
                 TextColumn::make('date')->label(__('filament.date'))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('countries.arabic_name')->label(__('filament.countries'))
+                    ->sortable()
+                    ->label(__('filament.countries'))
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('tags.tag_name')->label(__('filament.tags'))
                     ->sortable()
                     ->label(__('filament.tags'))
@@ -80,6 +84,10 @@ class NewsTable
                 ->preload(),
                 SelectFilter::make('keywords')->label(__('filament.keywords'))
                 ->relationship('keywords', 'keyword_name')
+                ->searchable()
+                ->preload(),
+                SelectFilter::make('countries')->label(__('filament.countries'))
+                ->relationship('countries', 'arabic_name')
                 ->searchable()
                 ->preload(),
                 Filter::make('created_from')->label(__('filament.created_from'))

@@ -73,6 +73,11 @@ class NewsForm
                     ->multiple()
                     ->preload()
                     ->label(__('filament.tags')),
+                Select::make('countries')->label(__('filament.countries'))
+                    ->relationship(name: 'countries', titleAttribute: 'arabic_name')
+                    ->multiple()
+                    ->preload()
+                    ->label(__('filament.countries')),
                 DatePicker::make('date')->label(__('filament.date'))
                     ->default(null),
                 TextInput::make('sourcefeed_id')->label(__('filament.sourcefeed_id'))
