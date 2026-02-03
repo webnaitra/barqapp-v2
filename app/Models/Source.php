@@ -84,7 +84,7 @@ class Source extends Model
 
     public function categories()
     {
-        return $this->belongsToMany(Category::class, 'category_source','source_id','category_id');
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     public function users()

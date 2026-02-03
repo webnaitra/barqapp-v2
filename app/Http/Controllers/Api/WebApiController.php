@@ -2744,7 +2744,7 @@ public function getUserFavorites()
         try {
             $user = auth('api')->check() ? auth('api')->user() : null;
 
-            $mainCategories = Category::select('id', 'name', 'icon_class')->get();
+            $mainCategories = Category::select('id', 'name', 'arabic_name', 'icon_class')->get();
             $tags = Keyword::select('id', 'keyword_name')->orderBy('id', 'desc')->get();
             $userCategories = null;
             $userSources = null;
@@ -2769,7 +2769,9 @@ public function getUserFavorites()
                     return response()->json(['message' => 'Country not found'], 404);
                 }
 
-                $query->where('country_id', $country->id);
+            $query->whereHas('countries', function ($q) use ($country) {
+                $q->where('country_id', $country->id);
+            });
             }
 
             if ($category_slug) {
