@@ -26,7 +26,7 @@ use App\Models\{
     Adsense,
     Advertiser,
     Page,
-
+    Tag,
     Contact,
     Keyword,
     Whatsapp,
@@ -1944,9 +1944,9 @@ class WebApiController extends Controller
         $user->save();
 
         if ($push_notifications_enabled) {
-            $message = ($this->app_lang == "ar") ? "تم تفعيل الإشعارات عبر الدفع بنجاح" : "Push notifications enabled successfully";
+            $message = ($this->app_lang == "ar") ? "تم تفعيل الإشعارات بنجاح" : "Notifications enabled successfully";
         } else {
-            $message = ($this->app_lang == "ar") ? "تم إلغاء تفعيل الإشعارات عبر الدفع بنجاح" : "Push notifications disabled successfully";
+            $message = ($this->app_lang == "ar") ? "تم تعطيل الإشعارات بنجاح." : "Notifications disabled successfully";
         }
 
         return $this->returnResponse(200, 'success', $user->push_notifications_enabled, $message);
@@ -2430,7 +2430,72 @@ public function getUserFavorites()
         }
     }
 
-    public function getKeywordPage()
+    public function getTagPage()
+    {
+        $tag = request()->tag;
+
+        if (empty($tag)) {
+            return $this->missingParameter();
+        }
+        $tagInfo = Tag::select('id', 'tag_name', 'image')
+            ->where('tag_name', $tag)
+            ->first();
+
+        
+
+        $news = News::with(['category'])
+            ->select(
+                "id",
+                'name',
+                'slug',
+                'content',
+                'image',
+                'category_id',
+                'date',
+                'views',
+                'shares',
+                'urgent',
+                'video',
+                'source_id',
+                'source_link',
+                'created_at'
+            )
+
+            ->where(function ($query) use ($tag) {
+                 $query->orWhere('name', 'like', "%{$tag}%")
+                            ->orWhere('excerpt', 'like', "%{$tag}%")
+                            ->orWhere('content', 'like', "%{$tag}%");
+            });
+
+            if(!empty($tagInfo)) {
+                $news->orWhereHas('tags', function ($q) use ($tagInfo) {
+                    $q->where('tags.id', $tagInfo->id);
+                });
+            }
+
+            $news->orderBy('id', 'desc');
+          
+
+
+        $news = $news->distinct('slug')->take(10)->paginate(10);
+        $fullAds = AdminAd::where('type', 'full')->take(4)->inRandomOrder()->get();
+
+
+
+        $finalArray = [
+            'news' => $news,
+            'tag' => $tagInfo,
+            'full_ads' => $fullAds,
+        ];
+
+        if (!empty($news)) {
+            return $this->returnResponse(200, 'success', $finalArray, 'found');
+        } else {
+            return $this->returnResponse(403, 'failure', $finalArray, 'not found');
+        }
+    }
+
+        public function getKeywordPage()
     {
         $keyword = request()->keyword;
 

@@ -43,6 +43,7 @@ Route::post('/web/changeUserDetail', [WebApiController::class, 'changeUserDetail
 Route::get('/web/getSearchPage', [WebApiController::class, 'getSearchPage'])->name('api.web.getSearchPage');
 Route::get('/web/getCategoryPage', [WebApiController::class, 'getCategoryPage'])->name('api.web.getCategoryPage');
 Route::get('/web/getKeywordPage', [WebApiController::class, 'getKeywordPage'])->name('api.web.getKeywordPage');
+Route::get('/web/getTagPage', [WebApiController::class, 'getTagPage'])->name('api.web.getTagPage');
 Route::get('/web/getNewsSourcePage', [WebApiController::class, 'getNewsSourcePage'])->name('api.web.getNewsSourcePage');
 Route::get('/web/getSubCategoryPage', [WebApiController::class, 'getSubCategoryPage'])->name('api.web.getSubCategoryPage');
 Route::get('/web/getSingleNewsPage', [WebApiController::class, 'getSingleNewsPage'])->name('api.web.getSingleNewsPage');
