@@ -92,8 +92,8 @@ class Video extends Model
     public function getImageUrlAttribute()
     {
         if (filter_var($this->image, FILTER_VALIDATE_URL) === FALSE) {
-            $path = str_replace('storage/public/', '', $this->image);
-            return asset('storage/' . $path);
+            $path = str_replace('public/', 'storage/', $this->image);
+            return asset($path);
         }
 
         if (strpos($this->image, 'skynewsarabia.com') !== false) {
@@ -114,7 +114,7 @@ class Video extends Model
         if(!$this->sources) {
             return url('/images/barqapp_placeholder_large.jpg');
         }
-        $source_image = $this->sources->placeholder_image ? env('CRON_URL').'storage/'.$this->sources->placeholder_image : url('/images/barqapp_placeholder_large.jpg');
+        $source_image = $this->sources->placeholder_image ? $this->sources->placeholder_image : url('/images/barqapp_placeholder_large.jpg');
         return  $source_image;
     }
 

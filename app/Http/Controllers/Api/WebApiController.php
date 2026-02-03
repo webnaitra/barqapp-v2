@@ -232,7 +232,7 @@ class WebApiController extends Controller
 
         $featuredIds = $featured->pluck('id');
 
-        $videos = Video::select('id','name', 'source_id', 'video')->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
+        $videos = Video::select('id','name', 'source_id', 'video', 'image')->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
         ->orderBy('source_rank', 'asc')->orderBy('created_at', 'desc')->take(4)->get();
         $products = Affiliate::select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get();
         $topNews = News::with(['category'])->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')->latest()->take(4)->get();
@@ -254,7 +254,7 @@ class WebApiController extends Controller
            
             if ($category) {
                 $categories[] = array(
-                    'category_name' => $category->name,
+                    'category_name' => $category->arabic_name,
                     'category_slug' => $category->slug,
                     'category_color' => $category->color,
                     'category_id' => $category->id,
@@ -2341,9 +2341,9 @@ public function getUserFavorites()
             $videos = null;
 
             // Build the base query
-            $query = Video::select('id','name', 'source_id', 'video');
+            $query = Video::select('id','name', 'source_id', 'video', 'image');
 
-            $categories = Category::select('name', 'order', 'slug')
+            $categories = Category::select('name', 'arabic_name', 'order', 'slug')
             ->orderBy("order", 'asc')->get();
 
             // Apply category filter if provided
