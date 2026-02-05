@@ -106,6 +106,7 @@ class Video extends Model
         return $url;
     }
 
+
         public function getImageAttribute($value)
     {
         if($value) {

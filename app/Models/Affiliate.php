@@ -10,7 +10,7 @@ class Affiliate extends Model
 {
     use HasFactory;
     protected $table = 'affiliates';
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'view_url'];
     protected $guarded = [];
 
     protected static function booted()
@@ -37,6 +37,15 @@ class Affiliate extends Model
     public function productCategories()
     {
         return $this->belongsToMany(ProductCategory::class, 'affiliate_product_category', 'affiliate_id', 'product_category_id');
+    }
+
+    /**
+     * Append a custom attribute to the model source that will return the source url
+     */
+    public function getViewUrlAttribute()
+    {
+        $id = base64_encode($this->id);
+        return route('affiliate_share_view', array('id' => $id));
     }
     
     

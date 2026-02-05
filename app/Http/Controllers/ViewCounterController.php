@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class ViewCounterController extends Controller
 {
@@ -60,6 +61,27 @@ class ViewCounterController extends Controller
             return response()->json($goldResponse->json());
         } else {
             return response()->json(['error' => 'Failed to fetch gold price'], 500);
+        }
+    }
+
+    public function testBrowserLess(){
+        $url = 'https://www.shorouknews.com/egypt/rss';
+    
+        // Fetch the XML content
+        $response = Http::get($url, ['verify' => false, 'http_errors' => false]);
+        libxml_use_internal_errors(true);
+    
+        if ($response->successful()) {
+            $xml = simplexml_load_string($response->body(), 'SimpleXMLElement', LIBXML_NOCDATA);
+            dd($xml);
+            
+            // Convert to a collection or array for easier handling
+            $items = $xml->channel->item;
+            
+            return view('rss_view', ['items' => $items]);
+        } else {
+            return response()->json(['error' => 'Failed to fetch RSS feed'], 500);
+            
         }
     }
 }

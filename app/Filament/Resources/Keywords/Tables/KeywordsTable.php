@@ -26,7 +26,6 @@ class KeywordsTable
                     ->searchable(),
                 TextColumn::make('countries.arabic_name')->label(__('filament.countries'))
                     ->label(__('filament.countries'))
-                    ->sortable()
                     ->searchable(),
                 TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()

@@ -10,6 +10,7 @@ Route::get('/', function () {
 Route::any('/videos/{id}/view', [ViewCounterController::class, 'video'])->name('video_share_view');
 Route::any('/affiliate/{id}/view', [ViewCounterController::class, 'affiliate'])->name('affiliate_share_view');
 Route::any('/ads/{id}/view', [ViewCounterController::class, 'ads'])->name('ads_share_view');
+Route::get('/test/browserless', [ViewCounterController::class, 'testBrowserLess'])->name('test.browserless');
 
 
 Route::get('/run/cron/job', function () {

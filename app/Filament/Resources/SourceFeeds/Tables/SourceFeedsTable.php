@@ -69,30 +69,24 @@ class SourceFeedsTable
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel(__('filament.close'))
                     ->modalContent(function (\App\Models\SourceFeed $record) {
-                        $url = $record->source_url;
                         $items = [];
                         $error = null;
                         
-                        $client = new \GuzzleHttp\Client();
                         try {
-                            $response = $client->get($url, ['verify' => false]);
-                            if ($response->getStatusCode() == 200) {
-                                $data = $response->getBody()->getContents();
-                                $data = trim($data);
-                                $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
-                                
-                                if ($xml && isset($xml->channel->item)) {
-                                    foreach ($xml->channel->item as $item) {
-                                        $items[] = [
-                                            'title' => (string)$item->title,
-                                            'date' => (string)$item->pubDate,
-                                            'link' => (string)$item->link,
-                                        ];
-                                    }
+                            $service = new \App\Services\FetchArticlesService();
+                            // Calling fetch with $dryRun = true
+                            $results = $service->fetch(null, null, $record->id, true);
+                            
+                            if (!empty($results) && isset($results[0])) {
+                                if ($results[0]['status'] == 'error') {
+                                    $error = $results[0]['message'];
+                                } else {
+                                    $items = $results[0]['items'];
                                 }
                             } else {
-                                $error = 'Error: ' . $response->getStatusCode();
+                                $error = "No results returned";
                             }
+                            
                         } catch (\Exception $e) {
                             $error = $e->getMessage();
                         }

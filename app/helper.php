@@ -217,8 +217,12 @@ function _img($id, $default = true)
 
 function getOptionValue($key)
 {
-    $option = Option::where("option_name", $key)->first();
-    return (!empty($option->option_value)) ? $option->option_value : "";
+    try {
+        $settings = app(\App\Settings\GeneralSettings::class);
+        return $settings->$key ?? "";
+    } catch (\Exception $e) {
+        return "";
+    }
 }
 
 

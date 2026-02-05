@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use App\Models\Country;
+use App\Settings\GeneralSettings;
 
 class NewsFilterScope implements Scope
 {
@@ -23,8 +24,9 @@ class NewsFilterScope implements Scope
 
             $user = auth('api')->check() ? auth('api')->user() : null;
             if($user) {
-                $sourceFilterEnabled = getOptionValue('app_source_filter_enabled');
-                $categoryFilterEnabled = getOptionValue('app_category_filter_enabled');
+                $settings = app(GeneralSettings::class);
+                $sourceFilterEnabled = $settings->app_source_filter_enabled;
+                $categoryFilterEnabled = $settings->app_category_filter_enabled;
 
                 if ($sourceFilterEnabled == 'Yes') {
                     $userSourceIds = $user->sources->pluck('id')->toArray();

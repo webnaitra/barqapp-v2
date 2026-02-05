@@ -99,12 +99,10 @@ class AffiliateResource extends Resource
             ->columns([
                 TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('country.name')->label(__('filament.countryname'))
+                TextColumn::make('country.arabic_name')->label(__('filament.country'))
                     ->sortable(),
-                TextColumn::make('categories.name')->label(__('filament.categoriesname'))
-                    ->sortable(),
-                TextColumn::make('productCategories.name')->label(__('filament.productcategoriesname'))
-                    ->sortable(),
+                TextColumn::make('categories.arabic_name')->label(__('filament.categories')),
+                TextColumn::make('productCategories.arabic_name')->label(__('filament.productcategories')),
                 TextColumn::make('url')->label(__('filament.url'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -126,15 +124,15 @@ class AffiliateResource extends Resource
             ])
             ->filters([
             SelectFilter::make('categories')->label(__('filament.categories'))
-                ->relationship('categories', 'name')
+                ->relationship('categories', 'arabic_name')
                 ->searchable()
                 ->preload(),
             SelectFilter::make('productCategories')->label(__('filament.productcategories'))
-                ->relationship('productCategories', 'name')
+                ->relationship('productCategories', 'arabic_name')
                 ->searchable()
                 ->preload(),
             SelectFilter::make('country')->label(__('filament.country'))
-                ->relationship('country', 'name')
+                ->relationship('country', 'arabic_name')
                 ->searchable()
                 ->preload(),
             ], layout: FiltersLayout::AboveContent)

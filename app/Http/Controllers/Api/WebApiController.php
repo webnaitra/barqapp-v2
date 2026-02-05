@@ -234,11 +234,10 @@ class WebApiController extends Controller
 
         $videos = Video::select('id','name', 'source_id', 'video', 'image')->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
         ->orderBy('source_rank', 'asc')->orderBy('created_at', 'desc')->take(4)->get();
-        $products = Affiliate::select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get();
         $topNews = News::with(['category'])->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')->latest()->take(4)->get();
         $ads = AdminAd::where('type', 'column')->take(4)->inRandomOrder()->get();
         $fullAds = AdminAd::where('type', 'full')->take(4)->inRandomOrder()->get();
-        $affiliates = Affiliate::take(4)->get();
+        $affiliates = Affiliate::with('country')->take(4)->get();
 
         if($user){
             $featured_categories = array();
@@ -281,7 +280,6 @@ class WebApiController extends Controller
         $final_array = array(
             'featured' => $featured,
             'videos' => $videos,
-            'products' => $products,
             'featured_categories' => $categories,
             'top_news' => $topNews,
             'affiliates' => $affiliates,
@@ -1768,7 +1766,8 @@ class WebApiController extends Controller
     public function get_option_value($key)
     {
         $key = ($this->app_lang == "ar") ? $key : $key . "_en";
-        $value = getOptionValue($key);
+        $settings = app(GeneralSettings::class);
+        $value = $settings->$key ?? "";
         return $this->returnResponse(200, 'success', $value, 'found');
     }
 
@@ -2244,10 +2243,11 @@ public function getUserFavorites()
 
     public function getSocialLinks()
     {
-        $facebook = getOptionValue('app_facebook') ?? "";
-        $twitter = getOptionValue('app_twitter') ?? "";
-        $whatsapp = getOptionValue('app_whatsapp') ?? "";
-        $massenger = getOptionValue('app_massenger') ?? "";
+        $settings = app(GeneralSettings::class);
+        $facebook = $settings->app_facebook ?? "";
+        $twitter = $settings->app_twitter ?? "";
+        $whatsapp = $settings->app_whatsapp ?? "";
+        $massenger = $settings->app_massenger ?? "";
 
         return [
             'facebook' => $facebook,
@@ -2389,12 +2389,15 @@ public function getUserFavorites()
             );
             $obj = array();
 
+            $settings = app(GeneralSettings::class);
             foreach ($static_array as $key) {
-                $value = getOptionValue($key);
-                if ($key == 'banner_1' || $key == 'banner_2' || $key == 'banner_3')
-                    $obj[$key] = _img($value);
-                else
+                $value = $settings->$key ?? "";
+                if ($key == 'banner_1' || $key == 'banner_2' || $key == 'banner_3'){
+
+                    $obj[$key] = url(str_replace('public', 'storage', $value));
+                }else{
                     $obj[$key] = $value;
+                }
             } 
 
             if (!empty($categorySlug)) {
@@ -2414,7 +2417,7 @@ public function getUserFavorites()
                     ->paginate(24);
             }
 
-            $productCategories  = ProductCategory::select('id', 'name', 'slug', 'created_at', 'updated_at')->get();
+            $productCategories  = ProductCategory::select('id', 'name', 'arabic_name','slug', 'created_at', 'updated_at')->get();
 
             $finalArray = [
                 'settings' => $obj,

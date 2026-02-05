@@ -92,11 +92,16 @@ class AdminAdResource extends Resource
                     ->options([
                         'full' => 'Full',
                         'column' => 'Column',
+                        'affiliate-banner' => 'Affiliate Banner',
                     ])
                     ->default(null)
                     ->required(),
                 Select::make('categories')->label(__('filament.categories'))
                     ->relationship('categories', 'arabic_name')
+                    ->multiple()
+                    ->preload(),
+                Select::make('countries')->label(__('filament.countries'))
+                    ->relationship('countries', 'arabic_name')
                     ->multiple()
                     ->preload(),
                 Select::make('locations')->label(__('filament.locations'))
@@ -118,10 +123,9 @@ class AdminAdResource extends Resource
                         'full' => 'Full',
                         'column' => 'Column',
                     ]),
-                TextColumn::make('categories.arabic_name')->label(__('filament.categories'))
-                    ->sortable(),
-                TextColumn::make('locations.name')->label(__('filament.locations'))
-                    ->sortable(),
+                TextColumn::make('categories.arabic_name')->label(__('filament.categories')),
+                TextColumn::make('countries.arabic_name')->label(__('filament.countries')),
+                TextColumn::make('locations.name')->label(__('filament.locations')),
                 TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()
@@ -136,13 +140,18 @@ class AdminAdResource extends Resource
                 ->options([
                     'full' => 'Full',
                     'column' => 'Column',
+                    'affiliate-banner' => 'Affiliate Banner',
                 ]),
                 SelectFilter::make('locations')->label(__('filament.locations'))
                     ->relationship('locations', 'name')
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('categories')->label(__('filament.categories'))
-                    ->relationship('categories', 'name')
+                    ->relationship('categories', 'arabic_name')
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('countries')->label(__('filament.countries'))
+                    ->relationship('countries', 'arabic_name')
                     ->searchable()
                     ->preload(),
 

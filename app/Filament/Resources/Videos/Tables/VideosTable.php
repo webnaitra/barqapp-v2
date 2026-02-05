@@ -30,7 +30,6 @@ class VideosTable
                     ->sortable()
                     ->label(__('filament.category')),
                 TextColumn::make('countries.arabic_name')->label(__('filament.countriesarabic_name'))
-                    ->sortable()
                     ->label(__('filament.country')),
                 TextColumn::make('video')->label(__('filament.video'))
                     ->searchable()

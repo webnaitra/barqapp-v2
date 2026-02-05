@@ -21,8 +21,7 @@ class LiveStreamsTable
                 TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
                 TextColumn::make('countries.arabic_name')->label(__('filament.countries'))
-                    ->label(__('filament.country'))
-                    ->sortable(),
+                    ->label(__('filament.country')),
                 TextColumn::make('video')->label(__('filament.video'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),

@@ -28,8 +28,7 @@ class SourcesTable
                 TextColumn::make('arabic_name')->label(__('filament.arabic_name'))
                     ->searchable(),
                 TextColumn::make('countries.arabic_name')->label(__('filament.countries'))
-                    ->label(__('filament.countries'))
-                    ->sortable(),
+                    ->label(__('filament.countries')),
                 ToggleColumn::make('freeze')->label(__('filament.freeze')),
                 TextColumn::make('news_count')
                 ->counts('news')
