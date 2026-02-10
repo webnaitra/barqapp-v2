@@ -23,13 +23,13 @@ class VideosTable
             ->columns([
                 TextColumn::make('name')->label(__('filament.name'))
                     ->searchable(),
-                TextColumn::make('sources.arabic_name')->label(__('filament.sourcesarabic_name'))
+                TextColumn::make('sources.arabic_name')->label(__('filament.sources'))
                     ->searchable()
                     ->label(__('filament.source')),
-                TextColumn::make('category.arabic_name')->label(__('filament.categoryname'))
+                TextColumn::make('category.arabic_name')->label(__('filament.category'))
                     ->sortable()
                     ->label(__('filament.category')),
-                TextColumn::make('countries.arabic_name')->label(__('filament.countriesarabic_name'))
+                TextColumn::make('countries.arabic_name')->label(__('filament.countries'))
                     ->label(__('filament.country')),
                 TextColumn::make('video')->label(__('filament.video'))
                     ->searchable()

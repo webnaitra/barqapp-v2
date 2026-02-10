@@ -226,8 +226,9 @@ class WebApiController extends Controller
             'excerpt',
             'created_at'
         )->where('category_id', $firstCategory->id)
-        ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
+        ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
         ->orderBy('source_rank', 'asc') // Interleave: Rank 1s first, then Rank 2s...
+        ->orderBy('date', 'desc')
         ->orderBy('created_at', 'desc')->paginate(12);
 
         $featuredIds = $featured->pluck('id');
@@ -236,7 +237,8 @@ class WebApiController extends Controller
         ->orderBy('source_rank', 'asc')->orderBy('created_at', 'desc')->take(4)->get();
         $topNews = News::with(['category'])->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')->latest()->take(4)->get();
         $ads = AdminAd::where('type', 'column')->take(4)->inRandomOrder()->get();
-        $fullAds = AdminAd::where('type', 'full')->take(4)->inRandomOrder()->get();
+        $ads = AdminAd::where('type', 'column')->take(4)->inRandomOrder()->get();
+        $fullAds = $this->getFullAdsForLocation('Home');
         $affiliates = Affiliate::with('country')->take(4)->get();
 
         if($user){
@@ -271,8 +273,8 @@ class WebApiController extends Controller
                         'video',
                         'source_link',
                         'created_at'
-                    )->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
-                    ->orderBy('source_rank', 'asc')->orderBy('created_at', 'desc')->skip(0)->limit(10)->get()
+                    )->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
+                    ->orderBy('source_rank', 'asc')->orderBy('date', 'desc')->orderBy('created_at', 'desc')->skip(0)->limit(10)->get()
                 );
             }
         }
@@ -289,6 +291,33 @@ class WebApiController extends Controller
             'user' => $user,
         );
         return $this->returnResponse(200, 'success', $final_array, 'success');
+    }
+
+    private function getFullAdsForLocation($locationName, $categoryId = null)
+    {
+        $location = \App\Models\Location::where('name', $locationName)->first();
+        
+        // If location doesn't exist, fall back to generic "random full ads" or empty?
+        // Let's fallback to just random behavior if location is missing to avoid breaking API
+        if (!$location) {
+             // Or maybe we treat it as "No ads for this specific location"?
+             // Existing behavior was: AdminAd::where('type', 'full')->take(4)...
+             // Let's stick to existing behavior as fallback if location name is wrong, but scoped to 'full'
+             return AdminAd::where('type', 'full')->inRandomOrder()->take(4)->get();
+        }
+
+        $query = AdminAd::where('type', 'full')
+            ->whereHas('locations', function($q) use ($location) {
+                $q->where('locations.id', $location->id);
+            });
+
+        if ($categoryId) {
+             $query->whereHas('categories', function($q) use ($categoryId) {
+                 $q->where('categories.id', $categoryId);
+             });
+        }
+        
+        return $query->inRandomOrder()->take(4)->get();
     }
 
     public function getGoldRate()
@@ -319,14 +348,15 @@ class WebApiController extends Controller
                             ->orWhere('content', 'like', "%{$keyword}%");
                     }
                 })
-                ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
+                ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
                 ->orderBy('source_rank', 'asc')
+                ->orderBy('date', 'desc')
                 ->orderBy('created_at', 'desc')
                 ->limit(10)
                 ->get();
 
             $ads = AdminAd::where('type', 'column')->take(4)->inRandomOrder()->get();
-            $fullAds = AdminAd::where('type', 'full')->take(4)->inRandomOrder()->get();
+            $fullAds = $this->getFullAdsForLocation('Gold');
             $products = Affiliate::select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get();
 
 
@@ -483,14 +513,6 @@ class WebApiController extends Controller
                 return Cache::get($cacheKey);
             }
 
-            // Get API key from environment
-            $apiKey = env('GOLDAPI_KEY', '');
-            
-            if (empty($apiKey)) {
-                \Log::error('GOLDAPI_KEY is not set in environment variables');
-                return [];
-            }
-
             // Fetch gold prices from goldapi.io
             $goldUrl = env('GOLD_RATE_PROXY_URL', '') . "?currency={$baseCurrency}";
             $goldResponse = Http::get($goldUrl);
@@ -598,8 +620,9 @@ class WebApiController extends Controller
                             ->orWhere('content', 'like', "%{$keyword}%");
                     }
                 })
-                ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
+                ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
                 ->orderBy('source_rank', 'asc')
+                ->orderBy('date', 'desc')
                 ->orderBy('created_at', 'desc')
                 ->limit(10)
                 ->get();
@@ -609,7 +632,7 @@ class WebApiController extends Controller
             });
 
             $ads = AdminAd::where('type', 'column')->take(4)->inRandomOrder()->get();
-            $fullAds = AdminAd::where('type', 'full')->take(4)->inRandomOrder()->get();
+            $fullAds = $this->getFullAdsForLocation('Exchange Rate');
             $products = Affiliate::select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get();
 
 
@@ -641,7 +664,9 @@ class WebApiController extends Controller
             $final_array = array();
             $categories = array();
             $ads = $category->ads()->where('type', 'column')->take(4)->inRandomOrder()->get();
-            $fullAds = $category->ads()->where('type', 'full')->take(4)->inRandomOrder()->get();
+            $ads = $category->ads()->where('type', 'column')->take(4)->inRandomOrder()->get();
+            // Use helper to get ads for 'Category' location AND this specific category
+            $fullAds = $this->getFullAdsForLocation('Category', $category->id);
             $affiliates = $category->affiliates()->take(4)->get();
 
             $tags = $category->keywords()
@@ -664,8 +689,9 @@ class WebApiController extends Controller
                     'source_link',
                     'created_at'
                 )
-                ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
+                ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
                 ->orderBy('source_rank', 'asc')
+                ->orderBy('date', 'desc')
                 ->orderBy('created_at', 'desc')->paginate(15);
 
             if($news->count() == 0){
@@ -688,8 +714,9 @@ class WebApiController extends Controller
                     'source_link',
                     'created_at'
                 )
-                ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
+                ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
                 ->orderBy('source_rank', 'asc')
+                ->orderBy('date', 'desc')
                 ->orderBy('created_at', 'desc')->paginate(15);
             }
 
@@ -736,14 +763,16 @@ class WebApiController extends Controller
                     'source_link',
                     'created_at'
                 )
-                ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
+                ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
                 ->orderBy('source_rank', 'asc')
+                ->orderBy('date', 'desc')
                 ->orderBy('created_at', 'desc')->take(20)->paginate(20);
             }
 
                 $final_array = array(
                     'news' => $news,
                     'affiliates' => Affiliate::select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get(),
+                    'full_ads' => $this->getFullAdsForLocation('Source'),
                     'source' => $source->arabic_name,
                     'source_icon' => $source->logo_url,
                     'source_follower' => $source->followers,
@@ -986,9 +1015,10 @@ class WebApiController extends Controller
         $source = request()->source;
         $category = request()->category;
         $type = request()->type;
-        $ads = AdminAd::whereHas('locations', function ($query) {
+        $ads = AdminAd::where('type', 'column')->whereHas('locations', function ($query) {
             $query->where('name', 'Search');
-        })->get();
+        })->take(4)->inRandomOrder()->get();
+        $fullAds = $this->getFullAdsForLocation('Search');
 
         $news = News::with(['category'])
             ->select(
@@ -1048,6 +1078,7 @@ class WebApiController extends Controller
         $finalArray = [
             'news' => $news,
             'ads' => $ads,
+            'full_ads' => $fullAds,
             'affiliates' => Affiliate::select('id', 'image', 'name', 'description', 'price')->orderBy('id', 'desc')->take(4)->get(),
         ];
 
@@ -2481,7 +2512,7 @@ public function getUserFavorites()
 
 
         $news = $news->distinct('slug')->take(10)->paginate(10);
-        $fullAds = AdminAd::where('type', 'full')->take(4)->inRandomOrder()->get();
+        $fullAds = $this->getFullAdsForLocation('Topic');
 
 
 
@@ -2546,7 +2577,7 @@ public function getUserFavorites()
 
 
         $news = $news->distinct('slug')->take(10)->paginate(10);
-        $fullAds = AdminAd::where('type', 'full')->take(4)->inRandomOrder()->get();
+        $fullAds = $this->getFullAdsForLocation('Topic');
 
 
 
