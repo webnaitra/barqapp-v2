@@ -17,7 +17,8 @@
         "laravel/framework": "^11.0",
         "laravel/passport": "^13.0",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "predis/predis": "^3.3"
     },
     "files": [
         "app/helper.php"

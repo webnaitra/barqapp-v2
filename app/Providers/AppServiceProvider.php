@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Schema;
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
+use App\Observers\NewsObserver;
+use App\Models\News;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -51,5 +53,7 @@ class AppServiceProvider extends ServiceProvider
             'purple' => Color::Purple,
             'pink' => Color::Pink,
         ]);
+
+            News::observe(NewsObserver::class);
     }
 }
