@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\News;
 use App\Jobs\SingleCron;
+use Carbon\Carbon;
 
 class NewsObserver
 {
