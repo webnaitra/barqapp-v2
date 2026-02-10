@@ -659,7 +659,7 @@ class WebApiController extends Controller
         $news = array();
         if (!empty($category_slug)) {
             $category = Category::where('slug', $category_slug)->firstOrFail();
-            $categoryName = $category->name;
+            $categoryName = $category->arabic_name;
             $news = [];
             $final_array = array();
             $categories = array();
