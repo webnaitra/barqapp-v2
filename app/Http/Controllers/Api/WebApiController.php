@@ -212,6 +212,7 @@ class WebApiController extends Controller
         $countryCode = request()->input('country', 'EG');
         $country = Country::where('country_code', $countryCode)->first();
         $firstCategory = Category::where('order', 1)->first();
+
         $featured = News::with(['category'])->select(
             "id",
             'name',
@@ -227,11 +228,36 @@ class WebApiController extends Controller
             'created_at'
         )->where('category_id', $firstCategory->id)
         ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
+        ->orderBy('urgent', 'desc')
+        ->orderBy('source_rank', 'asc')
+        ->inRandomOrder()
+        ->take(6)->get();
+
+
+        $featuredIds = $featured->pluck('id');
+
+        $news = News::with(['category'])->select(
+            "id",
+            'name',
+            'slug',
+            'image',
+            'category_id',
+            'urgent',
+            'date',
+            'video',
+            'source_id',
+            'source_link',
+            'excerpt',
+            'created_at'
+        )->where('category_id', $firstCategory->id)
+        ->whereNotIn('id', $featuredIds)
+        ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
+        ->orderBy('urgent', 'desc')
         ->orderBy('source_rank', 'asc') // Interleave: Rank 1s first, then Rank 2s...
         ->orderBy('date', 'desc')
         ->orderBy('created_at', 'desc')->paginate(12);
 
-        $featuredIds = $featured->pluck('id');
+
 
         $videos = Video::select('id','name', 'source_id', 'video', 'image')->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
         ->orderBy('source_rank', 'asc')->orderBy('created_at', 'desc')->take(4)->get();
@@ -274,13 +300,14 @@ class WebApiController extends Controller
                         'source_link',
                         'created_at'
                     )->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
-                    ->orderBy('source_rank', 'asc')->orderBy('date', 'desc')->orderBy('created_at', 'desc')->skip(0)->limit(10)->get()
+                    ->orderBy('urgent', 'desc')->orderBy('source_rank', 'asc')->orderBy('date', 'desc')->orderBy('created_at', 'desc')->skip(0)->limit(10)->get()
                 );
             }
         }
 
         $final_array = array(
             'featured' => $featured,
+            'news' => $news,
             'videos' => $videos,
             'featured_categories' => $categories,
             'top_news' => $topNews,
@@ -349,6 +376,7 @@ class WebApiController extends Controller
                     }
                 })
                 ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
+                ->orderBy('urgent', 'desc')
                 ->orderBy('source_rank', 'asc')
                 ->orderBy('date', 'desc')
                 ->orderBy('created_at', 'desc')
@@ -621,6 +649,7 @@ class WebApiController extends Controller
                     }
                 })
                 ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
+                ->orderBy('urgent', 'desc')
                 ->orderBy('source_rank', 'asc')
                 ->orderBy('date', 'desc')
                 ->orderBy('created_at', 'desc')
@@ -690,6 +719,7 @@ class WebApiController extends Controller
                     'created_at'
                 )
                 ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
+                ->orderBy('urgent', 'desc')
                 ->orderBy('source_rank', 'asc')
                 ->orderBy('date', 'desc')
                 ->orderBy('created_at', 'desc')->paginate(15);
@@ -715,6 +745,7 @@ class WebApiController extends Controller
                     'created_at'
                 )
                 ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
+                ->orderBy('urgent', 'desc')
                 ->orderBy('source_rank', 'asc')
                 ->orderBy('date', 'desc')
                 ->orderBy('created_at', 'desc')->paginate(15);
@@ -764,6 +795,7 @@ class WebApiController extends Controller
                     'created_at'
                 )
                 ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY date DESC, created_at DESC) as source_rank')
+                ->orderBy('urgent', 'desc')
                 ->orderBy('source_rank', 'asc')
                 ->orderBy('date', 'desc')
                 ->orderBy('created_at', 'desc')->take(20)->paginate(20);
@@ -2410,26 +2442,41 @@ public function getUserFavorites()
             $categorySlug = request()->category;
             $category = null;
             $products = [];
-            $static_array = array(
-            'banner_1',
-            'banner_2',
-            'banner_3',
-            'banner_1_link',
-            'banner_2_link',
-            'banner_3_link',
-            );
-            $obj = array();
-
             $settings = app(GeneralSettings::class);
-            foreach ($static_array as $key) {
-                $value = $settings->$key ?? "";
-                if ($key == 'banner_1' || $key == 'banner_2' || $key == 'banner_3'){
+            $countryCode = request()->country;
+            $country = null;
 
-                    $obj[$key] = url(str_replace('public', 'storage', $value));
-                }else{
-                    $obj[$key] = $value;
-                }
-            } 
+            if ($countryCode) {
+                $country = Country::where('country_code', $countryCode)->first();
+            }
+
+            // Fetch Large Banner
+            $largeBannerQuery = AdminAd::where('type', 'affiliate-large-banner');
+            if ($country) {
+                $largeBannerQuery->whereHas('countries', function ($q) use ($country) {
+                    $q->where('country_id', $country->id);
+                });
+            }
+            $largeBanner = $largeBannerQuery->inRandomOrder()->first();
+
+            // Fetch Small Banners
+            $smallBannersQuery = AdminAd::where('type', 'affiliate-banner');
+            if ($country) {
+                $smallBannersQuery->whereHas('countries', function ($q) use ($country) {
+                    $q->where('country_id', $country->id);
+                });
+
+            }
+            $smallBanners = $smallBannersQuery->inRandomOrder()->take(2)->get();
+
+            $obj = array(
+                'banner_1' => $largeBanner ? $largeBanner->image_url : '',
+                'banner_2' => isset($smallBanners[0]) ? $smallBanners[0]->image_url : '',
+                'banner_3' => isset($smallBanners[1]) ? $smallBanners[1]->image_url : '',
+                'banner_1_link' => $largeBanner ? $largeBanner->url : '',
+                'banner_2_link' => isset($smallBanners[0]) ? $smallBanners[0]->url : '',
+                'banner_3_link' => isset($smallBanners[1]) ? $smallBanners[1]->url : '',
+            ); 
 
             if (!empty($categorySlug)) {
                 $category = ProductCategory::where('slug', $categorySlug)->first();
@@ -2507,6 +2554,7 @@ public function getUserFavorites()
                 });
             }
 
+            $news->orderBy('urgent', 'desc');
             $news->orderBy('id', 'desc');
           
 
@@ -2572,6 +2620,7 @@ public function getUserFavorites()
                 });
             }
 
+            $news->orderBy('urgent', 'desc');
             $news->orderBy('id', 'desc');
           
 

@@ -93,6 +93,7 @@ class AdminAdResource extends Resource
                         'full' => 'Full',
                         'column' => 'Column',
                         'affiliate-banner' => 'Affiliate Banner',
+                        'affiliate-large-banner' => 'Affiliate Large Banner'
                     ])
                     ->default(null)
                     ->required(),
@@ -122,6 +123,8 @@ class AdminAdResource extends Resource
                     ->options([
                         'full' => 'Full',
                         'column' => 'Column',
+                        'affiliate-banner' => 'Affiliate Banner',
+                        'affiliate-large-banner' => 'Affiliate Large Banner'
                     ]),
                 TextColumn::make('categories.arabic_name')->label(__('filament.categories')),
                 TextColumn::make('countries.arabic_name')->label(__('filament.countries')),
@@ -138,9 +141,10 @@ class AdminAdResource extends Resource
             ->filters([
                 SelectFilter::make('type')->label(__('filament.type'))
                 ->options([
-                    'full' => 'Full',
-                    'column' => 'Column',
-                    'affiliate-banner' => 'Affiliate Banner',
+                   'full' => 'Full',
+                   'column' => 'Column',
+                   'affiliate-banner' => 'Affiliate Banner',
+                   'affiliate-large-banner' => 'Affiliate Large Banner'
                 ]),
                 SelectFilter::make('locations')->label(__('filament.locations'))
                     ->relationship('locations', 'name')
