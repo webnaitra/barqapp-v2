@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class AdminAd extends Model
 {
     use HasFactory;
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'view_url'];
 
     protected $guarded = [];
 
