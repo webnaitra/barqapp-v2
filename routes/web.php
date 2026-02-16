@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ViewCounterController;
+use App\Http\Controllers\DailyDigestPreviewController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,3 +35,6 @@ Route::get('/empty/source/{sourceId}', function ($sourceId) {
     $exitCode = Artisan::call('cron:empty-articles', array('sourceId' => $sourceId, 'olderThanDays' => 3));
     echo "Articles Emptied (Older than 3 days)";
 })->name('source.empty');
+
+
+Route::get('/preview-digest/{userId?}', [DailyDigestPreviewController::class, 'preview'])->name('preview.digest');

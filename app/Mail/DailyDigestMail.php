@@ -12,18 +12,20 @@ class DailyDigestMail extends Mailable
 
     public $user;
     public $newsItems;
+    public $settings;
 
     public function __construct($user, $newsItems)
     {
         $this->user = $user;
         $this->newsItems = $newsItems;
+        $this->settings = app(\App\Settings\GeneralSettings::class);
         $this->topArticle = optional($newsItems->first(), function($item) {
         return [
             'title' => $item->name,
             'date' => $item->date,
             'slug' => $item->slug,
             'summary' => $item->excerpt,
-            'image' => $item->image,
+            'image' => $item->image_url,
             'url' => $item->url,
             'label' => 'عاجل',
         ];
@@ -35,9 +37,9 @@ class DailyDigestMail extends Mailable
             'date' => $item->date,
             'slug' => $item->slug,
             'summary' => $item->excerpt,
-            'image' => $item->image,
+            'image' => $item->image_url,
             'url' => $item->url,
-            'section' => $item->category->name ?? null,
+            'section' => $item->category->arabic_name ?? null,
         ];
     })->values()->all();
 
@@ -50,20 +52,22 @@ class DailyDigestMail extends Mailable
             ->with([
             'formattedDate' => now()->locale('ar')->translatedFormat('d MMMM y'),
             'logoUrl' => asset('assets/mail/logo.png'),
-            'promoBannerUrl' => asset('assets/mail/mid-banner.png'),
+            'promoBannerUrl' => asset('assets/mail/mid-banner.png'), // Keeping just in case, but likely replacing usage
             'androidBadgeUrl' => asset('assets/mail/android-app-store.png'),
             'iosBadgeUrl' => asset('assets/mail/apple-app-store.png'),
-            'androidLink' => "#",
-            'iosLink' => "#",
+            'androidLink' => $this->settings->app_google_play,
+            'iosLink' => $this->settings->app_app_store,
+            'appHeader' => $this->settings->app_header,
+            'appDownloadText' => $this->settings->app_download_text,
             'socialImageUrl' => asset('assets/mail/social-icons.png'),
             'topArticle' => $this->topArticle,
             'articles' => $this->articles,
             'social' => [
-                'twitter' => ['icon' => asset('assets/mail/x-twitter.png'), 'link' => 'https://twitter.com/YourProfile'],
-                'facebook' => ['icon' => asset('assets/mail/facebook-f.png'), 'link' => 'https://www.facebook.com/YourPage'],
-                'instagram' => ['icon' => asset('assets/mail/instagram.png'), 'link' => 'https://www.instagram.com/YourProfile'],
-                'youtube' => ['icon' => asset('assets/mail/youtube.png'), 'link' => 'https://www.youtube.com/YourChannel'],
-                'tiktok' => ['icon' => asset('assets/mail/tiktok.png'), 'link' => 'https://www.tiktok.com/YourProfile'],
+                'twitter' => ['icon' => asset('assets/mail/x-twitter.png'), 'link' => $this->settings->app_twitter],
+                'facebook' => ['icon' => asset('assets/mail/facebook-f.png'), 'link' => $this->settings->app_facebook],
+                'instagram' => ['icon' => asset('assets/mail/instagram.png'), 'link' => $this->settings->app_instagram],
+                'youtube' => ['icon' => asset('assets/mail/youtube.png'), 'link' => $this->settings->app_youtube],
+                'tiktok' => ['icon' => asset('assets/mail/tiktok.png'), 'link' => $this->settings->app_tiktok],
             ],
         ]);
             

@@ -97,19 +97,20 @@ class Advertiser extends Authenticatable
         return $this->hasMany(Favorite::class, 'fav_user_id');
     }
 
+
     public function userCategories()
     {
-        return $this->hasMany(UserCategory::class, 'user_id');
+        return $this->belongsToMany(Category::class, 'user_categories', 'user_id', 'category_id');
     }
 
     public function userKeywords()
     {
-        return $this->hasMany(UserKeyword::class, 'user_id');
+        return $this->belongsToMany(Keyword::class, 'user_keywords', 'user_id', 'keyword_id');
     }
 
     public function userSources()
     {
-        return $this->hasMany(UserSource::class, 'user_id');
+        return $this->belongsToMany(Source::class, 'user_sources', 'user_id', 'source_id');
     }
 
     public function notifications()
