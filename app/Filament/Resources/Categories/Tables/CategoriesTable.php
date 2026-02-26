@@ -55,7 +55,7 @@ class CategoriesTable
                     ->icon('heroicon-s-folder-open')
                     ->requiresConfirmation()
                     ->action(function ($record) {
-                        Artisan::call('cron:empty-articles', ['categoryId' => $record->id, 'olderThanDays' => 3]);
+                        Artisan::call('cron:empty-articles', ['categoryId' => $record->id]);
                         Notification::make()
                             ->title('Articles Emptied')
                             ->success()

@@ -71,6 +71,7 @@ Route::get('/web/getSettingsObject', [WebApiController::class, 'getSettingsObjec
 Route::post('/web/addUserCategory', [WebApiController::class, 'addUserCategory'])->name('api.web.addUserCategory');
 Route::post('/web/increaseVideoLikes', [WebApiController::class, 'increaseVideoLikes'])->name('api.web.increaseVideoLikes');
 Route::post('/web/addUserSources', [WebApiController::class, 'addUserSources'])->name('api.web.addUserSources');
+Route::post('/web/saveContactus', [WebApiController::class, 'saveContactUs'])->name('api.web.saveContactUs');
 Route::get('/web/getSubscribedSources', [WebApiController::class, 'getSubscribedSources'])->name('api.web.getSubscribedSources');
 Route::post('/web/addUserTopic', [WebApiController::class, 'toggleUserTopic'])->name('api.web.addUserTopic');
 Route::post('/web/detachUserTopic', [WebApiController::class, 'toggleUserTopic'])->name('api.web.detachUserTopic');

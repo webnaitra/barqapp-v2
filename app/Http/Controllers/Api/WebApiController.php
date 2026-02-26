@@ -310,7 +310,6 @@ class WebApiController extends Controller
             'news' => $news,
             'videos' => $videos,
             'featured_categories' => $categories,
-            'top_news' => $topNews,
             'affiliates' => $affiliates,
             'ads' =>  $ads,
             'full_ads' =>  $fullAds,
@@ -1746,6 +1745,27 @@ class WebApiController extends Controller
         return $news;
     }
 
+
+        public function saveContactUs(Request $request)
+    {
+        $request = $request->all();
+        $name = (!empty($request['name'])) ? $request['name'] : '';
+        $email = (!empty($request['email'])) ? $request['email'] : '';
+        $message = (!empty($request['message'])) ? $request['message'] : '';
+        if (empty($name) || empty($email) || empty($message)) {
+            return $this->missingParameter();
+        }
+        $contact = new Contact;
+        $contact->contact_name = $name;
+        $contact->contact_email = $email;
+        $contact->contact_message = $message;
+        $contact->save();
+        $message = ($this->app_lang == "ar") ? " تمت الاضافة بنجاح" : "Inserted successfully";
+        //        addAdminNotify('new_contact', $contact->id, route('contacts_preview', $contact->id));
+
+        return $this->returnResponse(200, 'success', 1, $message);
+    }
+
     /*
     public function getFooterMenu()
     {
@@ -1834,25 +1854,7 @@ class WebApiController extends Controller
         return $this->returnResponse(200, 'success', $value, 'found');
     }
 
-    public function saveContactUs(Request $request)
-    {
-        $request = $request->all();
-        $name = (!empty($request['name'])) ? $request['name'] : '';
-        $email = (!empty($request['email'])) ? $request['email'] : '';
-        $message = (!empty($request['message'])) ? $request['message'] : '';
-        if (empty($name) || empty($email) || empty($message)) {
-            return $this->missingParameter();
-        }
-        $contact = new Contact;
-        $contact->contact_name = $name;
-        $contact->contact_email = $email;
-        $contact->contact_message = $message;
-        $contact->save();
-        $message = ($this->app_lang == "ar") ? " تمت الاضافة بنجاح" : "Inserted successfully";
-        //        addAdminNotify('new_contact', $contact->id, route('contacts_preview', $contact->id));
 
-        return $this->returnResponse(200, 'success', 1, $message);
-    }
 
     public function ads_areas(Request $request)
     {

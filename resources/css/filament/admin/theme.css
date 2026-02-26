@@ -8,3 +8,8 @@
 @source '../../../../app/Livewire/**/*';
 @source '../../../../vendor/bezhansalleh/filament-language-switch/resources/views/**/*.blade.php';
 @source '../../../../vendor/biostate/filament-menu-builder/resources/views/**/*';
+
+/* Custom styles for the admin panel can be added here */
+.fi-simple-page-content .fi-logo {
+    height: 8rem !important;
+}

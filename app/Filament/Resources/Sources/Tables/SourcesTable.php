@@ -72,7 +72,7 @@ class SourcesTable
                     ->color('danger')
                     ->requiresConfirmation()
                     ->action(function ($record) {
-                        Artisan::call('cron:empty-articles', ['sourceId' => $record->id, 'olderThanDays' => 3]);
+                        Artisan::call('cron:empty-articles', ['sourceId' => $record->id]);
                         Notification::make()
                             ->title('Articles Emptied')
                             ->success()
