@@ -91,6 +91,23 @@ class Video extends Model
 
     public function getImageUrlAttribute()
     {
+        $videoUrl = $this->source_link ?? $this->video;
+        
+        if ($videoUrl && (strpos($videoUrl, 'youtube.com') !== false || strpos($videoUrl, 'youtu.be') !== false)) {
+            $videoId = null;
+            if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $videoUrl, $match)) {
+                $videoId = $match[1];
+            }
+            
+            if ($videoId) {
+                return "https://img.youtube.com/vi/{$videoId}/maxresdefault.jpg";
+            }
+        }
+
+        if (empty($this->image)) {
+            return $this->image_attribute;
+        }
+
         if (filter_var($this->image, FILTER_VALIDATE_URL) === FALSE) {
             $path = str_replace('public/', 'storage/', $this->image);
             return asset($path);

@@ -149,32 +149,6 @@ class WebApiController extends Controller
             'app_download_text',
         );
 
-
-        if($page == 'contact'){
-
-            $contact_title = $settings->contact_title ?? "";
-            $contact_introduction = $settings->contact_introduction ?? "";
-            $contact_form_title = $settings->contact_form_title ?? "";
-            $contact_form_introduction = $settings->contact_form_introduction ?? "";
-            $contact_address_title = $settings->contact_address_title ?? "";
-            $contact_address_content = $settings->contact_address_content ?? "";
-            $contact_email_title = $settings->contact_email_title ?? "";
-            $contact_email_content = $settings->contact_email_content ?? "";
-            $contact_phone_title = $settings->contact_phone_title ?? "";
-            $contact_phone_content = $settings->contact_phone_content ?? "";
-            $static_array[] = 'contact_title';
-            $static_array[] = 'contact_introduction';
-            $static_array[] = 'contact_form_title';
-            $static_array[] = 'contact_form_introduction';
-            $static_array[] = 'contact_address_title';
-            $static_array[] = 'contact_address_content';
-            $static_array[] = 'contact_email_title';
-            $static_array[] = 'contact_email_content';
-            $static_array[] = 'contact_phone_title';
-            $static_array[] = 'contact_phone_content';
-
-
-        }
         $obj = array();
         foreach ($static_array as $field) {
             $obj[$field] = $settings->$field ?? "";
@@ -200,6 +174,26 @@ class WebApiController extends Controller
         return $this->returnResponse(200, 'success', $final_array, 'success');
     }
 
+
+    
+    public function getContactPage(GeneralSettings $settings)
+    {
+
+        $contact_settings = [
+            'contact_title' => $settings->contact_title ?? "",
+            'contact_introduction' => $settings->contact_introduction ?? "",
+            'contact_form_title' => $settings->contact_form_title ?? "",
+            'contact_form_introduction' => $settings->contact_form_introduction ?? "",
+            'contact_address_title' => $settings->contact_address_title ?? "",
+            'contact_address_content' => $settings->contact_address_content ?? "",
+            'contact_email_title' => $settings->contact_email_title ?? "",
+            'contact_email_content' => $settings->contact_email_content ?? "",
+            'contact_phone_title' => $settings->contact_phone_title ?? "",
+            'contact_phone_content' => $settings->contact_phone_content ?? "",
+        ];
+
+        return $this->returnResponse(200, 'success', $contact_settings, 'success');
+    }
 
     public function getHomePage()
     {
@@ -920,27 +914,32 @@ class WebApiController extends Controller
         if (!empty($news_slug) ||  !empty($news_id)) {
 
             if (!empty($news_slug) && $news_slug) {
-                $news = News::with(['category'])->where('slug', $news_slug)->firstOrFail();
+                $news = News::withoutGlobalScope(NewsFilterScope::class)->with(['category'])->where('slug', $news_slug)->firstOrFail();
             }
 
             if (!empty($news_id) && $news_id) {
-                $news = News::with(['category'])->where('id', $news_id)->firstOrFail();
+                $news = News::withoutGlobalScope(NewsFilterScope::class)->with(['category'])->where('id', $news_id)->firstOrFail();
             }
 
 
             if(request()->country){
                 $country = Country::where('country_code', request()->country)->first();
-                $countryId = $country->id;
+                $countryId = $country->id ?? null;
             }else{
-                $countryId = $news->sources->countries[0]->id;
+                $countryId = $news->sources->countries[0]->id ?? null;
             }
 
             $keywords = $news->keywords;
-            $previous_news_id = News::where('id', '<', $news->id)->whereHas('sources.countries', function ($q) use ($countryId) {
-                $q->where('countries.id', $countryId);
-            })->max('id');
+            $previous_news_id = News::where('id', '<', $news->id);
+            if ($countryId) {
+                $previous_news_id->whereHas('sources.countries', function ($q) use ($countryId) {
+                    $q->where('countries.id', $countryId);
+                });
+            }
+            $previous_news_id = $previous_news_id->max('id');
+
             $firstCategory = Category::where('order', 1)->first();
-            $topNews = News::with(['category'])->select(
+            $topNewsQuery = News::with(['category'])->select(
                 "id",
                 'name',
                 'slug',
@@ -953,11 +952,19 @@ class WebApiController extends Controller
                 'source_link',
                 'excerpt',
                 'created_at'
-            )->where('category_id', $firstCategory->id)
-            ->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
+            )->where('category_id', $firstCategory->id);
+            
+            if ($countryId) {
+                $topNewsQuery->whereHas('sources.countries', function ($q) use ($countryId) {
+                    $q->where('countries.id', $countryId);
+                });
+            }
+
+            $topNews = $topNewsQuery->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
             ->orderBy('source_rank', 'asc') // Interleave: Rank 1s first, then Rank 2s...
             ->orderBy('created_at', 'desc')->take(4)->get();
-            $post_related_news = News::with(['category'])->where('category_id', $news->category_id)->select(
+
+            $postRelatedNewsQuery = News::with(['category'])->where('category_id', $news->category_id)->select(
                 "id",
                 'name',
                 'slug',
@@ -969,8 +976,17 @@ class WebApiController extends Controller
                 'source_id',
                 'source_link',
                 'created_at'
-            )->whereNotIn('id', [$previous_news_id, $news->id])->inRandomOrder()->take(3)->get()->toArray();
-            $related_news = News::with(['category'])->where('category_id', $news->category_id)->select(
+            )->whereNotIn('id', [$previous_news_id, $news->id]);
+
+            if ($countryId) {
+                $postRelatedNewsQuery->whereHas('sources.countries', function ($q) use ($countryId) {
+                    $q->where('countries.id', $countryId);
+                });
+            }
+
+            $post_related_news = $postRelatedNewsQuery->inRandomOrder()->take(3)->get()->toArray();
+
+            $relatedNewsQuery = News::with(['category'])->where('category_id', $news->category_id)->select(
                 "id",
                 'name',
                 'slug',
@@ -982,7 +998,15 @@ class WebApiController extends Controller
                 'source_id',
                 'source_link',
                 'created_at'
-            )->whereNotIn('id', [$previous_news_id, $news->id])->inRandomOrder()->take(15)->get()->toArray();
+            )->whereNotIn('id', [$previous_news_id, $news->id]);
+
+            if ($countryId) {
+                $relatedNewsQuery->whereHas('sources.countries', function ($q) use ($countryId) {
+                    $q->where('countries.id', $countryId);
+                });
+            }
+
+            $related_news = $relatedNewsQuery->inRandomOrder()->take(15)->get()->toArray();
 
             $related_news = Arr::shuffle($related_news);
             $html = $news->content;
@@ -1029,7 +1053,7 @@ class WebApiController extends Controller
                 'news' => $news,
                 'related_news' => $related_news,
                 'previous_news_id' => $previous_news_id,
-                'keyowrds' => $keywords,
+                'keywords' => $keywords,
                 'affiliates' => $affiliates,
                 'top_news' => $topNews
             );

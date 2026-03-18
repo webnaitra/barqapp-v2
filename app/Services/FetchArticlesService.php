@@ -166,7 +166,7 @@ class FetchArticlesService
                 $url2 = 'news-' . uniqid();
             }
 
-            $date = $parsedItem['date'] ?? date('Y-m-d H:i:s');
+            $date = date('Y-m-d H:i:s');
             $post_status = 'New';
             $matchedTags = [];
             $matchedKeywords = [];
@@ -215,10 +215,6 @@ class FetchArticlesService
                         
                         $post->save();
 
-                        $source = Source::find($source_id);
-                        if ($source) {
-                            $post->countries()->attach($source->countries->pluck('id'));
-                        }
 
                         // Tags & Keywords
                         $this->matchAndAttach($post, $this->tagsMap, 'tags');
@@ -295,11 +291,7 @@ class FetchArticlesService
         }
 
         try {
-            if ($dateStr) {
-                $data['date'] = \Carbon\Carbon::parse($dateStr)->format('Y-m-d H:i:s');
-            } else {
-                $data['date'] = date('Y-m-d H:i:s'); 
-            }
+            $data['date'] = date('Y-m-d H:i:s'); 
         } catch (\Exception $e) {
             $data['date'] = date('Y-m-d H:i:s'); 
         }

@@ -26,6 +26,17 @@ class News extends Model
     protected static function booted()
     {
         static::addGlobalScope(new NewsFilterScope);
+
+        static::saved(function ($news) {
+            if ($news->isDirty('source_id') || $news->wasRecentlyCreated) {
+                if ($news->sources) {
+                    $countryIds = $news->sources->countries->pluck('id')->toArray();
+                    $news->countries()->sync($countryIds);
+                } else {
+                    $news->countries()->detach();
+                }
+            }
+        });
     }
 
 

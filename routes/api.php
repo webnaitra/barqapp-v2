@@ -68,6 +68,7 @@ Route::get('/web/getAffiliatePage', [WebApiController::class, 'getAffiliatePage'
 Route::get('/web/getKeywordSearchPage', [WebApiController::class, 'getKeywordPage'])->name('api.web.getKeywordSearchPage');
 Route::get('/web/getAllCountries', [WebApiController::class, 'getAllCountries'])->name('api.web.getAllCountries');
 Route::get('/web/getSettingsObject', [WebApiController::class, 'getSettingsObject'])->name('api.web.getSettingsObject');
+Route::get('/web/getContactPage', [WebApiController::class, 'getContactPage'])->name('api.web.getContactPage');
 Route::post('/web/addUserCategory', [WebApiController::class, 'addUserCategory'])->name('api.web.addUserCategory');
 Route::post('/web/increaseVideoLikes', [WebApiController::class, 'increaseVideoLikes'])->name('api.web.increaseVideoLikes');
 Route::post('/web/addUserSources', [WebApiController::class, 'addUserSources'])->name('api.web.addUserSources');

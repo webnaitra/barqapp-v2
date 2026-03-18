@@ -25,8 +25,14 @@
                             <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 {{ $item['title'] ?? 'N/A' }}
                             </td>
-                            <td class="px-6 py-4">
-                                {{ \Carbon\Carbon::parse($item['date'])->format('d M, Y h:i A') }}
+                            <td class="px-6 py-4 text-nowrap">
+                                @php
+                                    try {
+                                        echo $item['date'] ? \Carbon\Carbon::parse($item['date'])->format('d M, Y h:i A') : 'N/A';
+                                    } catch (\Exception $e) {
+                                        echo 'Invalid Date';
+                                    }
+                                @endphp
                             </td>
                             <td class="px-6 py-4">
                                 <a href="{{ $item['link'] ?? '#' }}" target="_blank" class="inline-block px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900">

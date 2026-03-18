@@ -67,12 +67,20 @@ class NewsForm
                     ->relationship(name: 'keywords', titleAttribute: 'keyword_name')
                     ->multiple()
                     ->preload()
-                    ->label(__('filament.keywords')),
+                    ->label(__('filament.keywords'))
+                    ->createOptionForm([
+                        TextInput::make('keyword_name')
+                            ->required()
+                    ]),
                 Select::make('tags')->label(__('filament.tags'))
                     ->relationship(name: 'tags', titleAttribute: 'tag_name')
                     ->multiple()
                     ->preload()
-                    ->label(__('filament.tags')),
+                    ->label(__('filament.tags'))
+                    ->createOptionForm([
+                        TextInput::make('tag_name')
+                            ->required()
+                    ]),
                 Select::make('countries')->label(__('filament.countries'))
                     ->relationship(name: 'countries', titleAttribute: 'arabic_name')
                     ->multiple()

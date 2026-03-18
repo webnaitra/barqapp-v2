@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
+use Filament\Forms\Components\CheckboxList;
 use Illuminate\Support\Facades\Hash;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\DateTimePicker;
@@ -65,10 +65,8 @@ class UserResource extends Resource
                 TextInput::make('nickname')->label(__('filament.nickname'))
                     ->maxLength(255)
                     ->default(null),
-                Select::make('roles')
+                CheckboxList::make('roles')
                     ->relationship('roles', 'name')
-                    ->multiple()
-                    ->preload()
                     ->searchable(),
                 FileUpload::make('image')->label(__('filament.image'))
                     ->image()
