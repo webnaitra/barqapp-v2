@@ -1,9 +1,25 @@
 <x-filament-panels::page>
+    <form wire:submit="submit">
+        {{ $this->form }}
+        <div style="margin-top:20px; margin-bottom:20px; display:flex; justify-content:end; align-items:center;">
+            <x-filament::button color="danger"  type="submit">
+                Submit
+            </x-filament::button>
+        </div>
+    </form>
+
+    <div class="border-t border-gray-200 dark:border-gray-700 my-6"></div>
+
     @if($startFetch)
         <div class="space-y-6">
-            <div class="flex justify-between items-center">
-
-            </div>
+            @if($isProcessing || $offset > 0)
+                <div class="flex items-center gap-3 p-4 bg-primary-50 dark:bg-primary-900/10 border border-primary-200 dark:border-primary-800 rounded-xl">
+                    <x-filament::loading-indicator class="h-5 w-5 text-primary-600" wire:loading wire:target="runFetch" />
+                    <span class="text-sm font-medium text-primary-700 dark:text-primary-400">
+                        {{ $isProcessing ? 'Processing' : 'Completed' }}: {{ min($offset, $totalFeeds) }} / {{ $totalFeeds }} Feeds
+                    </span>
+                </div>
+            @endif
 
             @foreach($fetchResults as $feedResult)
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -52,8 +68,8 @@
             @endforeach
         </div>
     @else
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
+        <div class="p-6 text-center text-gray-500">
+           Select filters and click submit to fetch articles.
         </div>
     @endif
 </x-filament-panels::page>

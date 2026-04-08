@@ -253,8 +253,15 @@ class WebApiController extends Controller
 
 
 
-        $videos = Video::select('id','name', 'source_id', 'video', 'image')->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
-        ->orderBy('source_rank', 'asc')->orderBy('created_at', 'desc')->take(4)->get();
+        $videos = Video::select('id', 'name', 'source_id', 'video', 'image')->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')
+            ->orderBy('source_rank', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->take(4)
+            ->get()
+            ->map(function ($video) {
+                $video->name = mb_substr($video->name, 0, 46);
+                return $video;
+            });
         $topNews = News::with(['category'])->selectRaw('ROW_NUMBER() OVER (PARTITION BY source_id ORDER BY id DESC) as source_rank')->latest()->take(4)->get();
         $ads = AdminAd::where('type', 'column')->take(4)->inRandomOrder()->get();
         $ads = AdminAd::where('type', 'column')->take(4)->inRandomOrder()->get();

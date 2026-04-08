@@ -10,6 +10,7 @@ use App\Models\News;
 use App\Models\Tag;
 use App\Models\Keyword;
 use App\Models\Country;
+use App\Models\AiWord;
 use Illuminate\Support\Facades\Log;
 
 class FetchArticlesService
@@ -17,9 +18,12 @@ class FetchArticlesService
     protected $client;
     protected $tagsMap = null;
     protected $keywordsMap = null;
+    protected $aiWords = null;
+    protected $aiWordsEnabled = false;
 
     public function __construct()
     {
+        $this->aiWordsEnabled = env('AIWORDS_ENABLED', false);
         $this->client = new Client([
             'headers' => [
                 'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -28,7 +32,7 @@ class FetchArticlesService
         ]);
     }
 
-    public function fetch($categoryId = null, $sourceId = null, $sourcefeedId = null, $dryRun = false)
+    public function fetch($categoryId = null, $sourceId = null, $sourcefeedId = null, $dryRun = false, $limit = 10, $offset = 0)
     {
         // Pre-load tags and keywords if not just a dry run (or even if dry run, to show what WOULD be tagged)
         // We do it once per instantiation/fetch call to avoid DB hits per item
@@ -39,28 +43,37 @@ class FetchArticlesService
             $this->keywordsMap = Keyword::pluck('id', 'keyword_name')->toArray();
         }
 
-        $rss_urls = SourceFeed::whereHas('source', function($query) {
+        if ($this->aiWordsEnabled && $this->aiWords === null) {
+            $this->aiWords = AiWord::with('tags')->get();
+        }
+
+        $query = SourceFeed::whereHas('source', function($query) {
             $query->select('name','source_url','category_id','source_id');
         });
 
         if(!empty($categoryId) && $categoryId != 'null'){
-            $rss_urls = $rss_urls->where('category_id', $categoryId);
+            Log::info("category id: $categoryId");
+            $query = $query->where('category_id', $categoryId);
         }
 
         if(!empty($sourceId) && $sourceId != 'null'){
-            $rss_urls = $rss_urls->where('source_id', $sourceId);
+            Log::info("source id: $sourceId");  
+            $query = $query->where('source_id', $sourceId);
         }
 
         if(!empty($sourcefeedId) && $sourcefeedId != 'null'){
-            $rss_urls = $rss_urls->where('id', $sourcefeedId);
+            Log::info("sourcefeed id: $sourcefeedId");
+            $query = $query->where('id', $sourcefeedId);
         }
 
-        $rss_urls = $rss_urls->with('source')->get();
+        $rss_urls = $query->with('source')->skip($offset)->take($limit)->lazy();
+        Log::info("Feed URL: $rss_urls");
 
         $results = [];
 
         foreach ($rss_urls as $rss_url) {
             $url = $rss_url->source_url;
+            Log::info("Feed URL: $url");
             $source_result = [
                 'source_name' => $rss_url->source->name ?? 'Unknown',
                 'feed_url' => $url,
@@ -92,6 +105,7 @@ class FetchArticlesService
                      $source_result['status'] = 'error';
                      $source_result['message'] = "HTTP $statusCode";
                      $results[] = $source_result;
+                     Log::error("Feed error: $url (HTTP $statusCode)");
                      continue;
                 }
 
@@ -138,6 +152,27 @@ class FetchArticlesService
         }
 
         return $results;
+    }
+
+    public function countFeeds($categoryId = null, $sourceId = null, $sourcefeedId = null)
+    {
+        $query = SourceFeed::whereHas('source', function($query) {
+            $query->select('name','source_url','category_id','source_id');
+        });
+
+        if(!empty($categoryId) && $categoryId != 'null'){
+            $query = $query->where('category_id', $categoryId);
+        }
+
+        if(!empty($sourceId) && $sourceId != 'null'){
+            $query = $query->where('source_id', $sourceId);
+        }
+
+        if(!empty($sourcefeedId) && $sourcefeedId != 'null'){
+            $query = $query->where('id', $sourcefeedId);
+        }
+
+        return $query->count();
     }
 
     protected function processFeed($xml, $rss_url, $dryRun)
@@ -219,6 +254,10 @@ class FetchArticlesService
                         // Tags & Keywords
                         $this->matchAndAttach($post, $this->tagsMap, 'tags');
                         $this->matchAndAttach($post, $this->keywordsMap, 'keywords'); // Assumes relation name 'keywords' exists on News
+
+                        if ($this->aiWordsEnabled) {
+                            $this->processAiWordMatching($post);
+                        }
 
                         $post_status = 'New';
                     } catch (\Exception $ex) {
@@ -378,6 +417,44 @@ class FetchArticlesService
     protected function matchTags($post)
     {
         // Wrapper for compatibility if necessary, but logic is moved to matchAndAttach
+    }
+
+    protected function processAiWordMatching($post)
+    {
+        if (!$this->aiWords) {
+            return;
+        }
+
+        $content = (string)$post->name . ' ' . (string)$post->content;
+
+        foreach ($this->aiWords as $aiWord) {
+            $words = array_filter(array_map('trim', explode(',', $aiWord->words)));
+            $matchCount = 0;
+
+            foreach ($words as $word) {
+                if (empty($word)) continue;
+                if (stripos($content, $word) !== false) {
+                    $matchCount++;
+                }
+            }
+
+            if ($matchCount > 5) {
+                // Update category if AiWord record has one
+                if ($aiWord->category_id) {
+                    $post->category_id = $aiWord->category_id;
+                    $post->save();
+                }
+
+                // Attach tags from AiWord record
+                $tagIds = $aiWord->tags->pluck('id')->toArray();
+                if (!empty($tagIds)) {
+                    $post->tags()->syncWithoutDetaching($tagIds);
+                }
+
+                // Stop after the first matching AiWord record to avoid conflicting categorizations
+                break;
+            }
+        }
     }
 
     protected function extractVideo($content)

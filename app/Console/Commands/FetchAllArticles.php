@@ -104,30 +104,47 @@ class FetchAllArticles extends Command
       $sourceId = $this->argument('sourceId');
       $sourcefeedId = $this->argument('sourcefeedId');
 
-      $results = $service->fetch($categoryId, $sourceId, $sourcefeedId);
+      if ($categoryId === 'null') $categoryId = null;
+      if ($sourceId === 'null') $sourceId = null;
+      if ($sourcefeedId === 'null') $sourcefeedId = null;
 
-      if ($showOutput) {
-          foreach ($results as $result) {
-              $this->info("Feed: " . $result['feed_url']);
-              if($result['status'] == 'error'){
-                  $this->error("Error: " . $result['message']);
-                  continue;
+      $totalFeeds = $service->countFeeds($categoryId, $sourceId, $sourcefeedId);
+      $this->info("Total feeds to process: $totalFeeds");
+
+      $batchSize = 10;
+      $offset = 0;
+
+      while ($offset < $totalFeeds) {
+          $this->info("Processing feeds " . ($offset + 1) . " to " . min($offset + $batchSize, $totalFeeds) . "...");
+          
+          $results = $service->fetch($categoryId, $sourceId, $sourcefeedId, false, $batchSize, $offset);
+
+          if ($showOutput) {
+              foreach ($results as $result) {
+                  $this->info("Feed: " . $result['feed_url']);
+                  if($result['status'] == 'error'){
+                      $this->error("Error: " . $result['message']);
+                      continue;
+                  }
+                  
+                  $headers = ['#', 'Name', 'Date', 'Status'];
+                  $rows = [];
+                  foreach (($result['items'] ?? []) as $index => $item) {
+                      $rows[] = [
+                          $index + 1,
+                          Str::limit($item['title'], 50),
+                          $item['date'],
+                          $item['status']
+                      ];
+                  }
+                  $this->table($headers, $rows);
               }
-              
-              $headers = ['#', 'Name', 'Date', 'Status'];
-              $rows = [];
-              foreach (($result['items'] ?? []) as $index => $item) {
-                  $rows[] = [
-                      $index + 1,
-                      Str::limit($item['title'], 50),
-                      $item['date'],
-                      $item['status']
-                  ];
-              }
-              $this->table($headers, $rows);
           }
+          
+          $offset += $batchSize;
       }
 
+      $this->info("Successfully processed all feeds.");
       return 0;
     }
 }

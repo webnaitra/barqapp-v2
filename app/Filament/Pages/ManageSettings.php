@@ -90,22 +90,7 @@ class ManageSettings extends SettingsPage
                                 TextInput::make('contact_phone_title')->label(__('filament.phone_title'))->columnSpanFull(),
                                 TextInput::make('contact_phone_content')->label(__('filament.phone_content'))->columnSpanFull(),
                             ])
-                            ->icon(Heroicon::OutlinedEnvelope),
-
-                        Tab::make('ads_banners')
-                            ->label(__('filament.ads_banners'))
-                            ->schema([
-                                FileUpload::make('banner_1')->label(__('filament.banner').' 1')->image()->directory('public/files')
-                    ->visibility('public')->columnSpanFull(),
-                                TextInput::make('banner_1_link')->label(__('filament.banner_link').' 1')->url()->columnSpanFull(),
-                                FileUpload::make('banner_2')->label(__('filament.banner').' 2')->image()->directory('public/files')
-                    ->visibility('public')->columnSpanFull(),
-                                TextInput::make('banner_2_link')->label(__('filament.banner_link').' 2')->url()->columnSpanFull(),
-                                FileUpload::make('banner_3')->label(__('filament.banner').' 3')->image()->directory('public/files')
-                    ->visibility('public')->columnSpanFull(),
-                                TextInput::make('banner_3_link')->label(__('filament.banner_link').' 3')->url()->columnSpanFull(),
-                            ])
-                            ->icon(Heroicon::OutlinedTv),
+                            ->icon(Heroicon::OutlinedEnvelope)
                     ])->columnSpan('full')
             ]);
     }
