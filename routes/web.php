@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ViewCounterController;
 use App\Http\Controllers\DailyDigestPreviewController;
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,6 +36,21 @@ Route::get('/empty/source/{sourceId}', function ($sourceId) {
     $exitCode = Artisan::call('cron:empty-articles', array('sourceId' => $sourceId, 'olderThanDays' => 3));
     echo "Articles Emptied (Older than 3 days)";
 })->name('source.empty');
+
+Route::get('/generate-passport-keys', function () {
+    try {
+        // Run the passport:keys command
+        // Use --force if you want to overwrite existing keys
+        Artisan::call('passport:keys');
+        
+        return response()->json([
+            'message' => 'Passport encryption keys generated successfully.',
+            'output' => Artisan::output()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
 
 
 Route::get('/preview-digest/{userId?}', [DailyDigestPreviewController::class, 'preview'])->name('preview.digest');
