@@ -37,7 +37,7 @@ Route::get('/empty/source/{sourceId}', function ($sourceId) {
     echo "Articles Emptied (Older than 3 days)";
 })->name('source.empty');
 
-Route::get('/generate-passport-keys', function () {
+Route::get('/generate-passport-keys-123', function () {
     try {
         // Run the passport:keys command
         // Use --force if you want to overwrite existing keys

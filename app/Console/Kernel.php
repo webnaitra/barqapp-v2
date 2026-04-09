@@ -5,6 +5,7 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\CreateDatabase;
+use Laravel\Passport\Console\KeysCommand;
 use App\Commands\FetchAllArticles;
 use App\Commands\FetchFullArticles;
 use App\Commands\EmptyArticles;
@@ -19,6 +20,7 @@ class Kernel extends ConsoleKernel
      */
 
     protected $commands = [
+        KeysCommand::class,
         CreateDatabase::class,
         FetchAllArticles::class,
         FetchFullArticles::class,
