@@ -66,40 +66,13 @@ class WebApiController extends Controller
     public function getServer(GeneralSettings $settings)
     {
 
-        $page = request()->input('page', '');
         $categories = Category::select("id", 'name', 'order', 'slug', 'color')
             ->orderBy("order", 'asc');
         $categories = $categories->get();
         $categories = $categories->toArray();
         $countries = Country::get();
-
-
-        $userId = request()->header('X-User-ID');
         $country = request()->input('country', 'EG');
         // dd($requestedCountry);
-        $user = null;
-        if ($userId) {
-            $advertiser = Advertiser::find($userId);
-            if (!empty($advertiser)) {
-                $this->table_prefix = "adv_";
-                $user = new AdvertiserResource($advertiser);
-            }
-        }
-
-        $user_sources = [];
-
-        if ($user) {
-            $sources = $user->sources()->select('sources.id', 'sources.arabic_name')->get();
-
-            foreach ($sources as $source) {
-                $user_sources[] = [
-                    'id' => $source->id,
-                    'name' => $source->arabic_name
-                ];
-            }
-        }
-
-
         // Get footer menus
         $menus = Menu::select("id", 'name')
             ->orderBy("id", 'asc')->get();
@@ -155,8 +128,6 @@ class WebApiController extends Controller
         }
 
         $final_array = array_merge($obj, array(
-            'user' => $user,
-            'subscribed_sources' => $user_sources,
             'server_timestamp' =>  $date->timestamp,
             'categories' => $categories,
             'menus' => $menus,
@@ -169,6 +140,45 @@ class WebApiController extends Controller
                 return $item['ticker'] === true;
             }),
             'site_date' => $date->format('Y F d') . ' ' . $hijri_date . ' ' . $date->englishDayOfWeek
+        ));
+
+        return $this->returnResponse(200, 'success', $final_array, 'success');
+    }
+
+
+    
+    public function getUser(GeneralSettings $settings)
+    {
+
+        $user = auth('api')->check() ? auth('api')->user() : null;
+        $userId = $user->id;
+        $user_sources = [];
+        $user_keywords = [];
+
+        if ($user) {
+            $sources = $user->sources()->select('sources.id', 'sources.arabic_name')->get();
+            $keywords = $user->keywords()->select('keywords.id', 'keywords.name')->get();
+
+            foreach ($sources as $source) {
+                $user_sources[] = [
+                    'id' => $source->id,
+                    'name' => $source->arabic_name
+                ];
+            }
+
+            foreach ($keywords as $keyword) {
+                $user_keywords[] = [
+                    'id' => $keyword->id,
+                    'name' => $keyword->name
+                ];
+            }
+        }
+
+
+        $final_array = array_merge($obj, array(
+            'user' => $user,
+            'subscribed_sources' => $user_sources,
+            'subscribed_keywords' => $user_keywords
         ));
 
         return $this->returnResponse(200, 'success', $final_array, 'success');

@@ -2,8 +2,8 @@
     <form wire:submit="submit">
         {{ $this->form }}
         <div style="margin-top:20px; margin-bottom:20px; display:flex; justify-content:end; align-items:center;">
-            <x-filament::button color="danger"  type="submit">
-                Submit
+            <x-filament::button color="danger"  type="submit" wire:loading.attr="disabled">
+                Submit  <x-filament::loading-indicator class="h-5 w-5" wire:loading wire:target="submit, runFetch" />
             </x-filament::button>
         </div>
     </form>

@@ -52,7 +52,24 @@ class RunCron extends Page implements HasForms
 
     public function mount()
     {
-        $this->form->fill();
+        $data = [];
+
+        $autoSubmit = false;
+        if (session('run_cron_action') === 'fetch') {
+            if ($categoryId = session('run_cron_category_id')) {
+                $data['categoryId'] = $categoryId;
+            }
+            if ($sourceId = session('run_cron_source_id')) {
+                $data['sourceId'] = $sourceId;
+            }
+            $autoSubmit = true;
+        }
+
+        $this->form->fill($data);
+
+        if ($autoSubmit) {
+            $this->submit();
+        }
     }
 
     public function form(Schema $schema): Schema

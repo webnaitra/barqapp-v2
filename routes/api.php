@@ -37,6 +37,7 @@ Route::any('/resetPassword', [AuthController::class, 'resetPassword']);
 
 /*********** Routes for Web App ******************/
 Route::get('/web/getServer', [WebApiController::class, 'getServer'])->name('api.web.getServer');
+Route::get('/web/getUser', [WebApiController::class, 'getUser'])->name('api.web.getUser');
 Route::get('/web/getHomePage', [WebApiController::class, 'getHomePage'])->name('api.web.getHomePage');
 Route::get('/web/getHomePageDev', [WebApiController::class, 'getHomePageDev'])->name('api.web.getHomePageDev');
 Route::post('/web/changeUserDetail', [WebApiController::class, 'changeUserDetail'])->name('api.web.changeUserDetail');
