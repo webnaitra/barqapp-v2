@@ -274,6 +274,8 @@ class FetchArticlesService
                 'link' => $link, // Added for UI
                 'tags_count' => count($matchedTags),
                 'keywords_count' => count($matchedKeywords),
+                'source_name' => $rss_url->source->name ?? 'Unknown',
+                'feed_url' => $rss_url->source_url,
             ];
         }
         
