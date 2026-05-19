@@ -31,7 +31,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
-        $schedule->command('delete:oldpost')
+        $schedule->command('cron:empty-articles')
         ->everySixHours();
         $schedule->command('cron:fetch-all-articles')
          ->everyThirtyMinutes();

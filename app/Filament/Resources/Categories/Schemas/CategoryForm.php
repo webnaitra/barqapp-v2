@@ -8,6 +8,7 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Str;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\ColorPicker;
 
 class CategoryForm
@@ -40,6 +41,22 @@ class CategoryForm
                 Toggle::make('freeze')->label(__('filament.freeze')),
                 Toggle::make('featured')->label(__('filament.featured'))
                     ->required(),
+                Select::make('fetch_frequency')->label(__('Fetch Frequency'))
+                    ->options([
+                        '30' => 'Every 30 minutes',
+                        '60' => 'Every 1 hour',
+                        '120' => 'Every 2 hours',
+                        '360' => 'Every 6 hours',
+                        '480' => 'Every 8 hours (3 times a day)',
+                        '720' => 'Every 12 hours (2 times a day)',
+                        '1440' => 'Every 24 hours (1 time a day)',
+                    ])
+                    ->default(null)
+                    ->placeholder('Default (Every 30 mins)'),
+                TextInput::make('auto_expire_duration')->label(__('Auto Expire Duration (Days)'))
+                    ->numeric()
+                    ->default(null)
+                    ->placeholder('Global Default (3 days)'),
             ]);
     }
 }

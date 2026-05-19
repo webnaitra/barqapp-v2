@@ -53,6 +53,11 @@ class ManageSettings extends SettingsPage
                                     'Yes' => __('filament.yes'),
                                     'No' => __('filament.no'),
                                 ])->columnSpanFull(),
+                                TextInput::make('auto_expire_duration')->label(__('Auto Expire Duration (Days)'))
+                                    ->numeric()
+                                    ->default(3)
+                                    ->required()
+                                    ->columnSpanFull(),
                                 Textarea::make('footer_text')->label(__('filament.footer_text'))->columnSpanFull(),
                                 TextInput::make('app_header')->label(__('filament.app_header'))->columnSpanFull(),
                                 Textarea::make('app_download_text')->label(__('filament.download_text'))->columnSpanFull(),

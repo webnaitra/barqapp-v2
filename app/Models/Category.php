@@ -13,7 +13,7 @@ class Category extends Model
      * @var array
      */
     protected $fillable = [
-        'name','arabic_name','slug', 'color', 'order', 'image', 'order', 'icon_class', 'freeze', 'featured'
+        'name','arabic_name','slug', 'color', 'order', 'image', 'order', 'icon_class', 'freeze', 'featured', 'fetch_frequency', 'auto_expire_duration'
     ];
 
     protected $appends = array('image_url');

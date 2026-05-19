@@ -35,6 +35,14 @@ class CategoriesTable
                 ->badge()
                 ->label(__('filament.news_count'))
                 ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('fetch_frequency')
+                    ->label(__('Fetch Frequency (Mins)'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('auto_expire_duration')
+                    ->label(__('Auto Expire Duration (Days)'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')->label(__('filament.created_at'))
                     ->dateTime()
                     ->sortable()

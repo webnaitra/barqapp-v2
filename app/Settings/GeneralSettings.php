@@ -16,6 +16,7 @@ class GeneralSettings extends Settings
     public ?string $app_app_store;
     public ?string $app_source_filter_enabled;
     public ?string $app_category_filter_enabled;
+    public ?int $auto_expire_duration;
 
     // Social
     public ?string $app_facebook;

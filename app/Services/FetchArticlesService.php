@@ -11,6 +11,7 @@ use App\Models\Tag;
 use App\Models\Keyword;
 use App\Models\Country;
 use App\Models\AiWord;
+use App\Models\ArticleFetchLog;
 use Illuminate\Support\Facades\Log;
 
 class FetchArticlesService
@@ -131,13 +132,13 @@ class FetchArticlesService
                      $source_result['message'] = $errorMsg;
                      
                      if (!$dryRun) {
-                        SourceFeed::where('source_url', $url)->update(['status_id' => '0']);
+                        SourceFeed::where('source_url', $url)->update(['status_id' => '0', 'last_fetched_at' => now()]);
                      }
                 } else {
                      $source_result['items'] = $this->processFeed($xml, $rss_url, $dryRun);
                      
                      if (!$dryRun) {
-                        SourceFeed::where('source_url', $url)->update(['status_id' => '1']);
+                        SourceFeed::where('source_url', $url)->update(['status_id' => '1', 'last_fetched_at' => now()]);
                      }
                 }
 
@@ -173,6 +174,77 @@ class FetchArticlesService
         }
 
         return $query->count();
+    }
+
+    public function processSingleFeed(SourceFeed $rss_url, ?string $batchId = null, $dryRun = false)
+    {
+        if ($this->tagsMap === null) {
+            $this->tagsMap = Tag::pluck('id', 'tag_name')->toArray();
+        }
+        if ($this->keywordsMap === null) {
+            $this->keywordsMap = Keyword::pluck('id', 'keyword_name')->toArray();
+        }
+        if ($this->aiWordsEnabled && $this->aiWords === null) {
+            $this->aiWords = AiWord::with('tags')->get();
+        }
+
+        $url = $rss_url->source_url;
+        Log::info("Job Feed URL: $url");
+
+        if(empty($url)){
+             return;
+        }
+
+        try {
+            $response = $this->client->get($url, ['verify' => false, 'http_errors' => false]);
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode === 403 || $statusCode === 503 || $statusCode !== 200) {
+                if (!$dryRun) {
+                    SourceFeed::where('source_url', $url)->update(['status_id' => '0', 'last_fetched_at' => now()]);
+                }
+                return;
+            }
+
+            $data = $response->getBody()->getContents();
+            $data = trim($data);
+
+            if (empty($data)) {
+                return;
+            }
+
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+
+            if ($xml === false) {
+                 libxml_clear_errors();
+                 if (!$dryRun) {
+                    SourceFeed::where('source_url', $url)->update(['status_id' => '0', 'last_fetched_at' => now()]);
+                 }
+            } else {
+                 $items = $this->processFeed($xml, $rss_url, $dryRun);
+                 
+                 if ($batchId && !empty($items)) {
+                     foreach ($items as $item) {
+                         ArticleFetchLog::create([
+                             'batch_id' => $batchId,
+                             'source_name' => $item['source_name'] ?? 'Unknown',
+                             'feed_url' => $item['feed_url'] ?? $url,
+                             'title' => $item['title'] ?? '',
+                             'link' => $item['link'] ?? '',
+                             'status' => $item['status'] ?? 'Unknown',
+                         ]);
+                     }
+                 }
+
+                 if (!$dryRun) {
+                    SourceFeed::where('source_url', $url)->update(['status_id' => '1', 'last_fetched_at' => now()]);
+                 }
+            }
+
+        } catch (\Exception $e) {
+             Log::error("Job Feed Error: " . $e->getMessage());
+        }
     }
 
     protected function processFeed($xml, $rss_url, $dryRun)

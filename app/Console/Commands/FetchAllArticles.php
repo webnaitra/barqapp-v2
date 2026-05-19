@@ -49,102 +49,84 @@ class FetchAllArticles extends Command
     }
 
     /**
-     * Extract video from an article if it exists
-     */
-
-     public function extractVideo($content){
-      preg_match_all(
-        '@(https?://)?(?:www\.)?(youtu(?:\.be/([-\w]+)|be\.com/watch\?v=([-\w]+)))\S*@im',
-        $content,
-        $matches
-      );
-      return isset($matches[0][0]) ? $matches[0][0] : null;
-    }
-
-    /**
-     *  Extract clean source url
-     */
-
-    function extractCleanUrl($linkContent) {
-    // First, URL decode the content
-        $decoded = urldecode($linkContent);
-        
-        // Check if it contains an anchor tag with href
-        if (preg_match('/href=["\']([^"\']+)["\']/', $decoded, $matches)) {
-            // Extract the URL from href attribute
-            $url = $matches[1];
-            
-            // Decode the URL (it might be double or triple encoded)
-            while (strpos($url, '%') !== false && $url !== urldecode($url)) {
-                $url = urldecode($url);
-            }
-            
-            return $url;
-        }
-        
-        // If no href found, just decode and return
-        $url = $decoded;
-        while (strpos($url, '%') !== false && $url !== urldecode($url)) {
-            $url = urldecode($url);
-        }
-        
-        return $url;
-    }
-
-
-    /**
      * Execute the console command.
      *
      * @return int
      */
     public function handle(FetchArticlesService $service)
     {
-      $showOutput = $this->argument('showOutput');
-      $categoryId = $this->argument('categoryId');
-      $sourceId = $this->argument('sourceId');
-      $sourcefeedId = $this->argument('sourcefeedId');
+        $showOutput = $this->argument('showOutput');
+        $categoryId = $this->argument('categoryId');
+        $sourceId = $this->argument('sourceId');
+        $sourcefeedId = $this->argument('sourcefeedId');
 
-      if ($categoryId === 'null') $categoryId = null;
-      if ($sourceId === 'null') $sourceId = null;
-      if ($sourcefeedId === 'null') $sourcefeedId = null;
+        if ($categoryId === 'null') $categoryId = null;
+        if ($sourceId === 'null') $sourceId = null;
+        if ($sourcefeedId === 'null') $sourcefeedId = null;
 
-      $totalFeeds = $service->countFeeds($categoryId, $sourceId, $sourcefeedId);
-      $this->info("Total feeds to process: $totalFeeds");
+        $query = SourceFeed::with(['source', 'category'])->whereHas('source', function($q) {
+            $q->select('name','source_url','category_id','source_id');
+        });
 
-      $batchSize = 10;
-      $offset = 0;
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+        if ($sourceId) {
+            $query->where('source_id', $sourceId);
+        }
+        if ($sourcefeedId) {
+            $query->where('id', $sourcefeedId);
+        }
 
-      while ($offset < $totalFeeds) {
-          $this->info("Processing feeds " . ($offset + 1) . " to " . min($offset + $batchSize, $totalFeeds) . "...");
-          
-          $results = $service->fetch($categoryId, $sourceId, $sourcefeedId, false, $batchSize, $offset);
+        $allFeeds = $query->get();
+        $feeds = collect();
+        $now = \Carbon\Carbon::now();
 
-          if ($showOutput) {
-              foreach ($results as $result) {
-                  $this->info("Feed: " . $result['feed_url']);
-                  if($result['status'] == 'error'){
-                      $this->error("Error: " . $result['message']);
-                      continue;
-                  }
-                  
-                  $headers = ['#', 'Name', 'Date', 'Status'];
-                  $rows = [];
-                  foreach (($result['items'] ?? []) as $index => $item) {
-                      $rows[] = [
-                          $index + 1,
-                          Str::limit($item['title'], 50),
-                          $item['date'],
-                          $item['status']
-                      ];
-                  }
-                  $this->table($headers, $rows);
-              }
-          }
-          
-          $offset += $batchSize;
-      }
+        foreach ($allFeeds as $feed) {
+            $frequency = $feed->source->fetch_frequency ?? $feed->category->fetch_frequency ?? 30; // Default 30 mins
+            
+            if (is_null($feed->last_fetched_at)) {
+                $feeds->push($feed);
+                continue;
+            }
 
-      $this->info("Successfully processed all feeds.");
-      return 0;
+            $lastFetched = \Carbon\Carbon::parse($feed->last_fetched_at);
+            if ($now->diffInMinutes($lastFetched) >= $frequency) {
+                $feeds->push($feed);
+            }
+        }
+
+        $totalFeeds = $feeds->count();
+
+        $this->info("Total feeds to process: $totalFeeds");
+
+        if ($totalFeeds === 0) {
+            return 0;
+        }
+
+        if ($showOutput) {
+            $this->info("Running synchronously (showOutput = 1)...");
+            foreach ($feeds as $feed) {
+                $this->info("Processing feed: " . $feed->source_url);
+                $service->processSingleFeed($feed, null, false);
+            }
+            $this->info("Finished synchronous processing.");
+        } else {
+            $this->info("Dispatching background jobs...");
+            $jobs = [];
+            foreach ($feeds as $feed) {
+                $jobs[] = new \App\Jobs\ProcessFeedJob($feed, false);
+            }
+
+            $batch = \Illuminate\Support\Facades\Bus::batch($jobs)
+                ->name('Fetch Articles Command (Cron)')
+                ->onQueue('fetch-articles')
+                ->dispatch();
+
+            $this->info("Dispatched batch ID: " . $batch->id);
+            $this->info("Make sure your queue worker is running (php artisan queue:work).");
+        }
+
+        return 0;
     }
 }

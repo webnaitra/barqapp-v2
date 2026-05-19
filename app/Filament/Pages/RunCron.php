@@ -27,6 +27,10 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Bus;
+use App\Jobs\ProcessFeedJob;
+use App\Models\ArticleFetchLog;
+use App\Models\SourceFeed;
 
 class RunCron extends Page implements HasForms, HasTable
 {
@@ -51,15 +55,12 @@ class RunCron extends Page implements HasForms, HasTable
     protected string $view = 'filament.pages.run-cron';
     
     public $startFetch = false;
-    public $fetchResults = [];
     public ?array $data = [];
     public $totalFeeds = 0;
-    public $offset = 0;
-    public $batchSize = 10;
+    public $batchId = null;
     public $isProcessing = false;
     public $isFetched = false;
-
-    protected $listeners = ['fetchArticles' => 'runFetch', 'nextBatch' => 'runFetch'];
+    public $startedAt = null;
 
     public function mount()
     {
@@ -106,31 +107,13 @@ class RunCron extends Page implements HasForms, HasTable
 
     public function table(Table $table): Table
     {
-        $flattened = collect($this->fetchResults)
-        ->pluck('items')
-        ->collapse()
-        ->values()
-        ->all();
-
         return $table
-            ->query(fn() => null) // No Eloquent query
-            ->poll('5s') // Automatically refresh every 5 seconds to show new data
-            ->records(function (int $page, int $recordsPerPage): LengthAwarePaginator  {
-            // 1. Fetch and flatten your data
-            $allItems = collect($this->fetchResults)
-                ->pluck('items')
-                ->collapse()
-                ->values();
-            $items = $allItems->forPage($page, $recordsPerPage);
-                
-            return new LengthAwarePaginator(
-                $items,
-                total: $allItems->count(),
-                perPage: $recordsPerPage,
-                currentPage: $page,
-            );
-
-            })
+            ->query(
+                $this->batchId 
+                    ? ArticleFetchLog::where('batch_id', $this->batchId)->latest() 
+                    : ArticleFetchLog::query()->where('id', -1) // Empty query if no batch
+            )
+            ->poll('5s')
             ->columns([
                 TextColumn::make('source_name')
                     ->label(__('filament.source'))
@@ -139,7 +122,7 @@ class RunCron extends Page implements HasForms, HasTable
                     ->label(__('filament.title'))
                     ->wrap()
                     ->searchable(),
-                TextColumn::make('date')
+                TextColumn::make('created_at')
                     ->label(__('filament.date'))
                     ->dateTime(),
                 TextColumn::make('status')
@@ -148,9 +131,8 @@ class RunCron extends Page implements HasForms, HasTable
                     ->color(fn (string $state): string => match ($state) {
                         'New' => 'success',
                         'Already exist' => 'warning',
-                        'New' => 'success',
-                        'Existing' => 'warning',
-                        default => 'danger',
+                        'Error' => 'danger',
+                        default => 'secondary',
                     }),
                 ]);
     }
@@ -158,48 +140,65 @@ class RunCron extends Page implements HasForms, HasTable
 
     public function submit()
     {
-        $this->offset = 0;
-        $this->fetchResults = [];
-        $this->totalFeeds = 0;
         $this->startFetch = true;
-        $this->isFetched = false;
-        $this->runFetch();
-    }
-
-    public function runFetch() 
-    {
         $this->isProcessing = true;
-        $service = new \App\Services\FetchArticlesService();
-        
-        if ($this->offset === 0) {
-            $this->totalFeeds = $service->countFeeds(
-                $this->data['categoryId'] ?? null, 
-                $this->data['sourceId'] ?? null
-            );
+        $this->isFetched = false;
+        $this->startedAt = now();
+
+        $query = SourceFeed::whereHas('source', function($q) {
+            $q->select('name','source_url','category_id','source_id');
+        });
+
+        if(!empty($this->data['categoryId'])){
+            $query->where('category_id', $this->data['categoryId']);
+        }
+        if(!empty($this->data['sourceId'])){
+            $query->where('source_id', $this->data['sourceId']);
         }
 
-        $newResults = $service->fetch(
-            $this->data['categoryId'] ?? null, 
-            $this->data['sourceId'] ?? null,
-            null,
-            false,
-            $this->batchSize,
-            $this->offset
-        );
+        $feeds = $query->get();
+        $this->totalFeeds = $feeds->count();
 
-        $this->fetchResults = array_merge($this->fetchResults, $newResults);
-        $this->offset += $this->batchSize;
+        if ($this->totalFeeds > 0) {
+            $jobs = [];
+            foreach ($feeds as $feed) {
+                $jobs[] = new ProcessFeedJob($feed, false);
+            }
 
-        if ($this->offset < $this->totalFeeds) {
-            $this->dispatch('nextBatch');
+            $batch = Bus::batch($jobs)
+                ->name('Fetch Articles')
+                ->onQueue('fetch-articles')
+                ->dispatch();
+
+            $this->batchId = $batch->id;
         } else {
             $this->isProcessing = false;
             $this->isFetched = true;
             Notification::make()
-                ->title('Fetch Completed')
-                ->success()
+                ->title('No feeds found')
+                ->warning()
                 ->send();
         }
+    }
+
+    public function checkBatchStatus()
+    {
+        if ($this->batchId && $this->isProcessing) {
+            $batch = Bus::findBatch($this->batchId);
+            if ($batch && $batch->finished()) {
+                $this->isProcessing = false;
+                $this->isFetched = true;
+                Notification::make()
+                    ->title('Fetch Completed')
+                    ->success()
+                    ->send();
+            }
+        }
+    }
+
+    public function getBatchProperty()
+    {
+        return $this->batchId ? Bus::findBatch($this->batchId) : null;
     }
 
     protected function getHeaderActions(): array

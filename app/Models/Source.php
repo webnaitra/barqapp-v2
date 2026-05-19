@@ -35,7 +35,9 @@ class Source extends Model
         'filter_classes',
         'content_classes',
         'image_classes',
-        'freeze'
+        'freeze',
+        'fetch_frequency',
+        'auto_expire_duration'
     ];
 
     public function getLogoUrlAttribute()
